@@ -30,7 +30,7 @@
         android:layout_toRightOf="@id/text1"
         android:ems="4"
         android:inputType="textPersonName"
-        android:text="Name"
+        android:text="x"
         android:textSize="15sp"
         app:layout_constraintEnd_toStartOf="@+id/friend_phone_1"
         app:layout_constraintHorizontal_bias="1.0"

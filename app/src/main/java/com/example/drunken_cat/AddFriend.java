@@ -1,40 +1,42 @@
 package com.example.drunken_cat;
-import android.content.Context;
-import android.view.View;
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.*;
-import java.util.*;
-import java.io.*;
 
 
-public class AddFriend extends AppCompatActivity{
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashSet;
+
+public class AddFriend extends MainActivity{
     HashSet<String> set = new HashSet<String>();
-    private String mName, mPhoneNum;
+    String mName, mPhoneNum;
 
+    // 전화번호 정규식 추가
+    // 저장누르면 계속 덮붙여 써진다. 3줄이상이면 못 쓰게
+    // 전화번호부 Delete
     public AddFriend(String Name, String PhoneNum) {
         this.mName = Name;
         this.mPhoneNum = PhoneNum;
     }
 
-    public void AddToLocalDB(){
+    public void AddToLocalDB(File fos) throws IOException {
+        System.out.println(fos);
+        FileWriter fw = new FileWriter(fos,true);
+        BufferedWriter buff = new BufferedWriter(fw);;
+
+        buff.write(mName + " " + mPhoneNum + "\n");
 
         try {
-            FileOutputStream fos = openFileOutput("Friend_Data.txt", MODE_APPEND);
-            PrintWriter writer = new PrintWriter(fos);
-
-            for(int i=0; i<3; i++)
-                writer.write(mName +" "+ mPhoneNum+"\n");
-            writer.flush();
-            writer.close();
-
-        } catch (FileNotFoundException e) {
+            if (buff != null || fw !=null)
+                buff.close();
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
+
 
 }
 

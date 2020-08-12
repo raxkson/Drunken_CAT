@@ -12,7 +12,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.example.drunken_cat.Controller.AddFriend;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         /* 귀가천사 변수 선언 및 init */
+        final File file = new File(getApplicationContext().getFilesDir(),"Friend.txt");
 
         friend_name_1 = findViewById(R.id.friend_name_1);
         friend_phone_1 = findViewById(R.id.friend_phone_1);
@@ -54,14 +58,14 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < 3; i++) {
                     if (mEtNameArr[i].getText().toString().equals("") || mEtPhoneArr[i].getText().toString().equals("")) {
                         Toast.makeText(getApplicationContext(), "입력정보를 확인해주세요.", Toast.LENGTH_SHORT).show();
-
-
-
-
                     } else {
                         AddFriend req = new AddFriend(mEtNameArr[i].getText().toString(), mEtPhoneArr[i].getText().toString());
-                        req.AddToLocalDB();
-
+                        System.out.println(req.mName + req.mPhoneNum);
+                        try {
+                            req.AddToLocalDB(file);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
 
