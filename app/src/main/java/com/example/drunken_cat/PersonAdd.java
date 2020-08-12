@@ -1,43 +1,72 @@
 package com.example.drunken_cat;
-import java.util.Map.Entry;
+import android.content.Context;
+import android.view.View;
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
 import java.util.*;
+import java.io.*;
 
-public class PersonAdd {
-    private String Msg = "추가완료";
-    // 중복검사
-    // 배열 지인 등록 최대 100
-    // 오른차순 정렬 내놓고 지인 중복 검사시 이진탐색
-    // 예를들어 100명으로 지정해놓으면 "오류 출력하고" 제거기능 추가하나 ?
-    Map<String,String> person = new HashMap<String,String>(); // 지인 저장할 배열
+public class PersonAdd extends AppCompatActivity {
+    HashSet<String> set = new HashSet<String>();
+    EditText et,et2;
 
-    PersonAdd(String name_ , String phone_){
-        if(DuplicationVerify(name_,phone_)) {// 중복검사
-            Msg = "ADD COMPLETE";
-            SORT();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+   //     et=findViewById(R.id.et); // front 구현 되면 주석제거
+    //    et2=findViewById(R.id.et2); // front 구현 되면 주석제거
+
+    }
+
+    public void SaveData(View view) {
+        String name = et.getText().toString();
+        String phone = et2.getText().toString();
+        et.setText(""); et2.setText("");
+
+        DuplicationVerify(name,phone); // 중복검사
+
+        try {
+            FileOutputStream fos = openFileOutput("Friend_Data.txt", MODE_APPEND);
+            PrintWriter writer = new PrintWriter(fos);
+
+            Iterator iter = set.iterator();
+            while(iter.hasNext())
+                writer.write((String)iter.next() +"\n");
+
+            writer.flush();
+            writer.close();
+
+            //Toast.makeText(this, "saved", Toast.LENGTH_SHORT).show();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-        else
-            Msg = "이름이나 휴대폰이 중복";
-   }
-   //정렬 메소드
 
-   void SORT(){
-       List<String> keySetList = new ArrayList<>(person.keySet());
-       // 내림차순 //
-       Collections.sort(keySetList, new Comparator<String>() {
-           public int compare(String o1, String o2) {
-               return person.get(o1).compareTo(person.get(o2));
+
+    }
+
+
+   void DuplicationVerify(String n, String p){
+        String s = n+" "+p; set.add(s);
+
+       try {
+           FileInputStream InputStream = openFileInput("Friend_Data.txt");
+           InputStreamReader isr= new InputStreamReader(InputStream);
+           BufferedReader reader= new BufferedReader(isr);
+           StringBuffer buffer= new StringBuffer();
+
+           while(true){
+               String content= reader.readLine();
+               if(content==null)  break;
+               else set.add(content);
            }
-       });
-   }
-   boolean DuplicationVerify(String n, String p){
-       if(person.containsKey(n) && person.containsValue(p))// 이름과 폰이 둘다 있으면 !중복!
-           return false;
-       else if( person.containsValue(p)) // 폰만 있으도 중복
-           return false;
-        else {  // 이름만있으면 중복이 아님.
-           person.put(n,p);
-           return true;
-       }
+       } catch (FileNotFoundException e) {e.printStackTrace();} catch (IOException e) {e.printStackTrace();}
+
+       File mfile = new File("Friend_Data.txt");
+       mfile.delete();
   }
 
 
