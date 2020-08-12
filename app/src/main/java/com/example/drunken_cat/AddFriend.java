@@ -30,41 +30,20 @@ public class AddFriend extends AddFriendActivity {
         buff.write(mName + " " + mPhoneNum + "\n");
 
         try {
-            if (buff != null || fw !=null)
+            if (buff != null )
                 buff.close();
+            if( fw !=null)
+                fw.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    void DeleteFriend(File f){ // 지인 제거
-        f.delete();
-    }
-
-    public int CheckList(File f){ // 꽉찾는지 체크
-        int cnt=0;
-        StringBuffer buffer = new StringBuffer();
-        String data = null;
-        FileInputStream fis = null;
-        System.out.println("here");
-        try {
-            FileReader fr = new FileReader(f);
-            BufferedReader buf= new BufferedReader(fr);
 
 
-            while(buf.readLine() != null)
-                cnt++;
+  /*  public int CheckList(File f){ // 꽉찾는지 체크
 
-            fr.close();
-            buf.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return cnt;
-    }
-
+        */
 }
 
 
