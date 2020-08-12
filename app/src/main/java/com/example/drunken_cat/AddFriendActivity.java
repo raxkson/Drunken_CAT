@@ -28,9 +28,9 @@ public class AddFriendActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        /* 귀가천사 변수 선언 및 init */
         final File file = new File(getApplicationContext().getFilesDir(),"Friend.txt");
+        /* 귀가천사 변수 선언 및 init */
+
 
         friend_name_1 = findViewById(R.id.friend_name_1);
         friend_phone_1 = findViewById(R.id.friend_phone_1);
@@ -57,14 +57,24 @@ public class AddFriendActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "입력정보를 확인해주세요.", Toast.LENGTH_SHORT).show();
                     } else {
                         AddFriend req = new AddFriend(mEtNameArr[i].getText().toString(), mEtPhoneArr[i].getText().toString());
-                        System.out.println(req.mName + req.mPhoneNum);
+
                         try {
-                            req.AddToLocalDB(file);
+                            if(req.CheckList((file)) == 3)
+                            {
+                                // 메세지창 띄우기  꽉찾다고
+                                System.out.println("no!");
+                            }
+                            else
+                                req.AddToLocalDB(file);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
                 }
+                //Button btn = (Button) findViewById(R.id.btn_register_friend);
+              //  btn.setEnabled(false);
+
+
 
             }
         });
