@@ -7,6 +7,7 @@ public class AddFriend {
     public AddFriend(String Name, String PhoneNum) {
         this.mName = Name;
         this.mPhoneNum = PhoneNum;
+
     }
 
     public String getmName() {
@@ -16,7 +17,6 @@ public class AddFriend {
     public String getmPhoneNum() {
         return mPhoneNum;
     }
-
 
 
     public void AddToLocalDB(){

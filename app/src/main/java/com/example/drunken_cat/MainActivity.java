@@ -1,9 +1,11 @@
 package com.example.drunken_cat;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,11 +52,16 @@ public class MainActivity extends AppCompatActivity {
                 EditText[] mEtPhoneArr = {friend_phone_1, friend_phone_2, friend_phone_3};
 
                 for (int i = 0; i < 3; i++) {
-                    if (mEtNameArr[i].getText().toString().equals(null) || mEtPhoneArr[i].getText().toString().equals(null)) {
+                    if (mEtNameArr[i].getText().toString().equals("") || mEtPhoneArr[i].getText().toString().equals("")) {
                         Toast.makeText(getApplicationContext(), "입력정보를 확인해주세요.", Toast.LENGTH_SHORT).show();
+
+
+
+
                     } else {
                         AddFriend req = new AddFriend(mEtNameArr[i].getText().toString(), mEtPhoneArr[i].getText().toString());
                         req.AddToLocalDB();
+
                     }
                 }
 
