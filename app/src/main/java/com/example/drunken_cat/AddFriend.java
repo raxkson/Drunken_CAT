@@ -1,16 +1,12 @@
 package com.example.drunken_cat;
 
-
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashSet;
 
-public class AddFriend extends MainActivity{
+public class AddFriend extends AddFriendActivity {
     HashSet<String> set = new HashSet<String>();
     String mName, mPhoneNum;
 
