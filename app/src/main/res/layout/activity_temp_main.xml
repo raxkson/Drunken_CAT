@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite">
+
+    <ImageView
+        android:id="@+id/main_img_drunken"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        app:srcCompat="@drawable/ic_drunk" />
+
+    <TextView
+        android:id="@+id/main_img_comment_drunken"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/main_img_drunken"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="너의 주량은...."
+        android:textColor="@color/colorBalck"
+        android:textSize="18sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/main_img_comment_drunken"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/main_first_info_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:text="사람 1번"
+                    android:textColor="@color/colorBalck"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_weight="2"
+                    android:background="@drawable/style_input_box">
+
+                    <EditText
+                        android:id="@+id/main_first_info_name_field"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@null"
+                        android:hint="이름"
+                        android:inputType="text"
+                        android:paddingStart="10dp"
+                        android:stateListAnimator="@null" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:background="@drawable/style_input_box">
+
+
+                    <EditText
+                        android:id="@+id/main_first_info_number_field"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_weight="3"
+                        android:background="@null"
+                        android:hint="전화번호"
+                        android:inputType="numberDecimal"
+                        android:paddingStart="10dp"
+                        android:stateListAnimator="@null" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/main_second_info_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:text="사람 2번"
+                    android:textColor="@color/colorBalck"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_weight="2"
+                    android:background="@drawable/style_input_box">
+
+                    <EditText
+                        android:id="@+id/main_second_info_name_field"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@null"
+                        android:hint="이름"
+                        android:inputType="text"
+                        android:paddingStart="10dp"
+                        android:stateListAnimator="@null" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:background="@drawable/style_input_box">
+
+
+                    <EditText
+                        android:id="@+id/main_second_info_number_field"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_weight="3"
+                        android:background="@null"
+                        android:hint="전화번호"
+                        android:inputType="numberDecimal"
+                        android:paddingStart="10dp"
+                        android:stateListAnimator="@null" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/main_third_info_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:text="사람 3번"
+                    android:textColor="@color/colorBalck"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_weight="2"
+                    android:background="@drawable/style_input_box">
+
+                    <EditText
+                        android:id="@+id/main_third_info_name_field"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@null"
+                        android:hint="이름"
+                        android:inputType="text"
+                        android:paddingStart="10dp"
+                        android:stateListAnimator="@null" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:background="@drawable/style_input_box">
+
+
+                    <EditText
+                        android:id="@+id/main_third_info_number_field"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_weight="3"
+                        android:background="@null"
+                        android:hint="전화번호"
+                        android:inputType="numberDecimal"
+                        android:paddingStart="10dp"
+                        android:stateListAnimator="@null" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/style_gradation_box"
+        android:text="등록하기"
+        android:textColor="@color/colorWhite"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+
+</RelativeLayout>
