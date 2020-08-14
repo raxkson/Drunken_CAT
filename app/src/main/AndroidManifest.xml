@@ -19,15 +19,15 @@
         android:usesCleartextTraffic="true">
         <activity android:name=".MainActivity">
             <!--intent-filter만 옮겨서 자기 파일 수정하기-->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
         </activity>
         <activity android:name=".AddFriendActivity">
         </activity>
         <activity android:name=".ProxyDriverActivity">
-
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <!--meta-data for Kakao Map API-->
         <meta-data android:name="com.kakao.sdk.AppKey" android:value="5a0c14eca0395a9f04fc2997f26ff3b1"/>

@@ -9,7 +9,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="대리운전"
+        android:textStyle="bold"
+        android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -21,41 +23,130 @@
         android:layout_width="288dp"
         android:layout_height="48dp"
         android:layout_marginTop="164dp"
-        android:text="대리운전1"
+        android:text="서울"
+        android:background="@drawable/btn_proxy"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
     <Button
         android:id="@+id/btn_proxy2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="256dp"
-        android:text="대리운전2"
+        android:layout_marginTop="220dp"
+        android:background="@drawable/btn_proxy"
+        android:text="인천"
         app:layout_constraintEnd_toEndOf="@+id/btn_proxy1"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/btn_proxy1"
         app:layout_constraintTop_toTopOf="parent" />
 
+
     <Button
         android:id="@+id/btn_proxy3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="348dp"
-        android:text="대리운전3"
+        android:layout_marginTop="276dp"
+        android:background="@drawable/btn_proxy"
+        android:text="경기"
         app:layout_constraintEnd_toEndOf="@+id/btn_proxy2"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/btn_proxy2"
         app:layout_constraintTop_toTopOf="parent" />
 
 
+    <Button
+        android:id="@+id/btn_proxy4"
+        android:layout_width="288dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="332dp"
+        android:background="@drawable/btn_proxy"
+        android:text="대전"
+        app:layout_constraintEnd_toEndOf="@+id/btn_proxy3"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/btn_proxy3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_proxy5"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="388dp"
+        android:background="@drawable/btn_proxy"
+        android:text="대구"
+        app:layout_constraintEnd_toEndOf="@+id/btn_proxy4"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/btn_proxy4"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_proxy6"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="444dp"
+        android:background="@drawable/btn_proxy"
+        android:text="부산"
+        app:layout_constraintEnd_toEndOf="@+id/btn_proxy5"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/btn_proxy5"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_proxy7"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="500dp"
+        android:background="@drawable/btn_proxy"
+        android:text="광주"
+        app:layout_constraintEnd_toEndOf="@+id/btn_proxy6"
+        app:layout_constraintStart_toStartOf="@+id/btn_proxy6"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <Button
+        android:id="@+id/btn_proxy8"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="556dp"
+        android:background="@drawable/btn_proxy"
+        android:text="울산"
+        app:layout_constraintEnd_toEndOf="@+id/btn_proxy7"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/btn_proxy7"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_proxy9"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="612dp"
+        android:background="@drawable/btn_proxy"
+        android:text="세종"
+        app:layout_constraintEnd_toEndOf="@+id/btn_proxy8"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/btn_proxy8"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_proxy10"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="668dp"
+        android:background="@drawable/btn_proxy"
+        android:text="제주"
+        app:layout_constraintEnd_toEndOf="@+id/btn_proxy9"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/btn_proxy9"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageButton
         android:id="@+id/btn_kakao"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
+        android:layout_width="53dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="56dp"
-        android:src="@drawable/abc_vector_test"
+        android:src="@drawable/img_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
