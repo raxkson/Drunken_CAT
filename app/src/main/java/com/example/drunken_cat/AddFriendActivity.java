@@ -32,7 +32,7 @@ public class AddFriendActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_addfriend);
         final File file = new File(getApplicationContext().getFilesDir(),"Friend.txt");
         /* 귀가천사 변수 선언 및 init */
 
@@ -120,7 +120,7 @@ public class AddFriendActivity extends AppCompatActivity {
 
         btn_back.setOnClickListener(new View.OnClickListener() {
             public void onClick(View AddtoMain) {
-                Intent back_intent = new Intent(AddFriendActivity.this, back.class);
+                Intent back_intent = new Intent(AddFriendActivity.this, MainActivity.class);
                 startActivity(back_intent);
             }
         });
