@@ -13,7 +13,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.CAMERA,android.permission.READ_PHONE_STATE"/>
-
+    <!--Voice Recoding Permission -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <!--application-->
     <application
         android:allowBackup="true"
@@ -39,6 +42,7 @@
         <activity android:name=".MapNavigationActivity" />
         <activity android:name=".AddFriendActivity"/>
         <activity android:name=".ProxyDriverActivity"/>
+        <activity android:name=".recordingActivity"/>
         <!--meta-data for Kakao Map API-->
         <meta-data android:name="com.kakao.sdk.AppKey" android:value="5a0c14eca0395a9f04fc2997f26ff3b1"/>
     </application>
