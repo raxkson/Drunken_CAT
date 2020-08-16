@@ -38,12 +38,12 @@
                 android:layout_height="wrap_content"
                 android:text="장소이름 : "
                 android:textStyle="bold"
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 android:textSize="15sp"
                 />
 
             <TextView
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 android:id="@+id/placedetail_tv_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
                 android:textStyle="bold"
                 android:layout_height="wrap_content"
                 android:text="주소 : "
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 android:textSize="15sp"
                 />
 
@@ -72,7 +72,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 />
         </LinearLayout>
 
@@ -88,7 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="카테고리 : "
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 android:textSize="15sp"
                 />
 
@@ -97,7 +97,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 />
         </LinearLayout>
 
@@ -113,7 +113,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="장소 상세페이지 URL : "
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 android:textSize="15sp"
                 />
 
@@ -124,7 +124,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 />
         </LinearLayout>
 
@@ -140,7 +140,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="전화번호 : "
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 android:textSize="15sp"
                 />
 
@@ -150,7 +150,7 @@
                 android:layout_height="wrap_content"
                 android:autoLink="phone"
                 android:textSize="15sp"
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 />
         </LinearLayout>
 
