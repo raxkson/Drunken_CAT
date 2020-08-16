@@ -1,16 +1,20 @@
 package com.example.drunken_cat;
 
 import android.Manifest;
+import android.app.Service;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import android.widget.VideoView;
 import android.widget.MediaController;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -18,7 +22,7 @@ import androidx.core.content.ContextCompat;
 import java.io.File;
 import java.io.IOException;
 
-public class recording extends AppCompatActivity {
+public class recording extends AppCompatActivity{
     MediaRecorder record;
     String filename="";
     MediaPlayer player;
@@ -50,7 +54,9 @@ public class recording extends AppCompatActivity {
             }
         });
     }
-
+    protected void onDestroy(Bundle savedInstanceState) {
+        super.onDestroy();
+    }
     public void permission(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
                 ||ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -113,5 +119,16 @@ public class recording extends AppCompatActivity {
     }
 
 
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
+    onCrea
 
 }

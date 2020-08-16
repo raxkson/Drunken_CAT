@@ -46,6 +46,11 @@
 
         <!--meta-data for Kakao Map API-->
         <meta-data android:name="com.kakao.sdk.AppKey" android:value="5a0c14eca0395a9f04fc2997f26ff3b1"/>
+
+        <!--Voice Recording background -->
+        <service android:name=".recording" />
+
+
     </application>
 
 </manifest>
