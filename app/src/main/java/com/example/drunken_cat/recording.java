@@ -117,18 +117,4 @@ public class recording extends AppCompatActivity{
             player = null;
         }
     }
-
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
-    }
-    onCrea
-
 }
