@@ -8,4 +8,17 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="et_thema" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorControlNormal">#FFFFFF</item>
+        <!-- non focused line color -->
+        <item name="colorControlActivated">#AA2233</item>
+        <!-- focused line color -->
+        <item name="android:editTextColor">#000000</item>
+        <!-- text color --> <item name="android:textColorHighlight">#BBBBFF</item>
+        <!-- selected text color -->
+        <item name="android:textColorHint">#555555</item>
+        <!-- hint color -->
+    </style>
+
+
 </resources>
