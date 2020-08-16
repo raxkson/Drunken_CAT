@@ -37,12 +37,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".recordingActivity"/>
         <activity android:name=".PlaceDetailActivity"/>
         <activity android:name=".MapSearchDetailActivity"/>
         <activity android:name=".MapNavigationActivity" />
         <activity android:name=".AddFriendActivity"/>
         <activity android:name=".ProxyDriverActivity"/>
-        <activity android:name=".recordingActivity"/>
+
         <!--meta-data for Kakao Map API-->
         <meta-data android:name="com.kakao.sdk.AppKey" android:value="5a0c14eca0395a9f04fc2997f26ff3b1"/>
     </application>
