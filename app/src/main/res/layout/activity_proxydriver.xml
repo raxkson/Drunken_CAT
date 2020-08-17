@@ -4,70 +4,135 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProxyDriverActivity">
+    tools:context=".MapActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.053" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btn_proxy1"
-        android:layout_width="288dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="164dp"
-        android:text="대리운전1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/abc_vector_test" />
 
-    <Button
-        android:id="@+id/btn_proxy2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="256dp"
-        android:text="대리운전2"
-        app:layout_constraintEnd_toEndOf="@+id/btn_proxy1"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/btn_proxy1"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/btn_proxy3"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="348dp"
-        android:text="대리운전3"
-        app:layout_constraintEnd_toEndOf="@+id/btn_proxy2"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/btn_proxy2"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ImageButton
+            android:id="@+id/btn_kakao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/abc_vector_test" />
 
 
-    <ImageButton
-        android:id="@+id/btn_kakao"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
-        android:layout_marginTop="56dp"
-        android:src="@drawable/abc_vector_test"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
-        android:id="@+id/btn_back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="178dp"
-        android:src="@drawable/abc_vector_test"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:text="대리운전"
+                android:textStyle="bold"
+                android:fontFamily="@font/binggraemelona"
+                android:textSize="50dp" />
+
+
+            <Button
+                android:id="@+id/btn_proxy1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="서울"
+                android:fontFamily="@font/binggraemelona"
+                android:background="@drawable/btn_proxy"/>
+
+            <Button
+                android:id="@+id/btn_proxy2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/btn_proxy"
+                android:fontFamily="@font/binggraemelona"
+                android:text="인천" />
+
+            <Button
+                android:id="@+id/btn_proxy3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/btn_proxy"
+                android:text="경기" />
+
+            <Button
+                android:id="@+id/btn_proxy4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/btn_proxy"
+                android:fontFamily="@font/binggraemelona"
+                android:text="대전" />
+
+            <Button
+                android:id="@+id/btn_proxy5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/btn_proxy"
+                android:fontFamily="@font/binggraemelona"
+                android:text="대구" />
+
+            <Button
+                android:id="@+id/btn_proxy6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/btn_proxy"
+                android:fontFamily="@font/binggraemelona"
+                android:text="부산"/>
+
+            <Button
+                android:id="@+id/btn_proxy7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/btn_proxy"
+                android:fontFamily="@font/binggraemelona"
+                android:text="광주"/>
+
+
+            <Button
+                android:id="@+id/btn_proxy8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/btn_proxy"
+                android:fontFamily="@font/binggraemelona"
+                android:text="울산" />
+
+            <Button
+                android:id="@+id/btn_proxy9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/btn_proxy"
+                android:fontFamily="@font/binggraemelona"
+                android:text="세종"/>
+
+            <Button
+                android:id="@+id/btn_proxy10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/btn_proxy"
+                android:fontFamily="@font/binggraemelona"
+                android:text="제주" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
