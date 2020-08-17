@@ -1,116 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:visibility="visible"
     tools:context=".AddFriendActivity">
 
 
-    <TextView
-        android:id="@+id/text1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="귀가천사1"
-        android:textColor="#03A9F4"
-        android:textSize="15sp" />
-
-    <EditText
-        android:id="@+id/friend_name_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/round_et"
-        android:ems="4"
-        android:hint="지인 이름"
-        android:inputType="textPersonName"
-        android:paddingRight="10dp"
-        android:text=""
-        android:textSize="15sp"
-        android:theme="@style/et_thema" />
-
-    <EditText
-        android:id="@+id/friend_phone_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/round_et"
-        android:ems="10"
-
-        android:hint="휴대폰 번호"
-        android:inputType="phone"
-        android:textSize="15sp"
-        android:theme="@style/et_thema" />
 
 
-    <TextView
-        android:id="@+id/text2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:text="귀가천사2"
-        android:textColor="#03A9F4"
-        android:textSize="15sp" />
-
-
-    <EditText
-        android:id="@+id/friend_name_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/round_et"
-        android:ems="4"
-        android:hint="지인 이름"
-        android:inputType="textPersonName"
-        android:textSize="15sp"
-        android:theme="@style/et_thema" />
-
-    <EditText
-        android:id="@+id/friend_phone_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/round_et"
-        android:ems="10"
-        android:hint="휴대폰 번호"
-        android:inputType="phone"
-        android:textSize="15sp"
-        android:theme="@style/et_thema" />
-
-    <TextView
-        android:id="@+id/text3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="귀가천사3"
-        android:textColor="#03A9F4"
-        android:textSize="15sp" />
-
-    <EditText
-        android:id="@+id/friend_name_3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/round_et"
-        android:ems="4"
-        android:hint="지인 이름"
-        android:inputType="textPersonName"
-        android:textSize="15sp"
-        android:theme="@style/et_thema" />
-
-    <EditText
-        android:id="@+id/friend_phone_3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/round_et"
-        android:ems="4"
-        android:hint="휴대폰 번호"
-        android:inputType="phone"
-        android:textSize="15sp"
-        android:theme="@style/et_thema" />
-
-    <Button
-        android:id="@+id/btn_register_friend"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="등록하기" />
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <ImageButton
         android:id="@+id/btn_back"
@@ -122,6 +24,117 @@
         android:id="@+id/imageView"
         android:layout_width="150sp"
         android:layout_height="150sp"
+        android:layout_gravity="center"
         android:src="@mipmap/ic_launcher" />
 
+
+    <TextView
+        android:id="@+id/text1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:padding="10dp"
+        android:text="귀가천사1"
+        android:textColor="#03A9F4"
+        android:textSize="15sp" />
+
+    <EditText
+        android:id="@+id/friend_name_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="@drawable/round_et"
+        android:hint="지인 이름"
+        android:inputType="textPersonName"
+        android:paddingRight="10dp"
+        android:fontFamily="@font/binggraemelona"
+        android:theme="@style/et_thema" />
+
+    <EditText
+        android:id="@+id/friend_phone_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="@drawable/round_et"
+        android:hint="휴대폰 번호"
+        android:inputType="phone"
+        android:fontFamily="@font/binggraemelona"
+        android:theme="@style/et_thema" />
+
+
+    <TextView
+        android:id="@+id/text2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:padding="10dp"
+        android:text="귀가천사2"
+        android:textColor="#03A9F4"
+        android:textSize="15sp" />
+
+
+    <EditText
+        android:id="@+id/friend_name_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="@drawable/round_et"
+        android:hint="지인 이름"
+        android:inputType="textPersonName"
+        android:fontFamily="@font/binggraemelona"
+        android:theme="@style/et_thema" />
+
+    <EditText
+        android:id="@+id/friend_phone_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="@drawable/round_et"
+        android:hint="휴대폰 번호"
+        android:inputType="phone"
+        android:fontFamily="@font/binggraemelona"
+        android:theme="@style/et_thema" />
+
+    <TextView
+        android:id="@+id/text3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:padding="10dp"
+        android:text="귀가천사3"
+        android:textColor="#03A9F4"
+        android:textSize="15sp" />
+
+    <EditText
+        android:id="@+id/friend_name_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="@drawable/round_et"
+        android:hint="지인 이름"
+        android:inputType="textPersonName"
+        android:fontFamily="@font/binggraemelona"
+        android:theme="@style/et_thema" />
+
+    <EditText
+        android:id="@+id/friend_phone_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="@drawable/round_et"
+        android:hint="휴대폰 번호"
+        android:inputType="phone"
+        android:fontFamily="@font/binggraemelona"
+        android:theme="@style/et_thema" />
+
+    <Button
+        android:id="@+id/btn_register_friend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        android:text="등록하기" />
+
+
 </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
