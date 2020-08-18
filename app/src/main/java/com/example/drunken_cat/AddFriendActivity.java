@@ -1,6 +1,7 @@
 package com.example.drunken_cat;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,6 +9,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedReader;
@@ -16,18 +18,32 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import com.example.drunken_cat.CipherFunc;
 
 public class AddFriendActivity extends AppCompatActivity {
 
     private ImageButton btn_back;
-
+    private String key = "DrunkenCAT";
     EditText friend_name_1, friend_phone_1,
             friend_name_2, friend_phone_2,
             friend_name_3, friend_phone_3;
 
     Button btn_register_friend;
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public String decFunc(String s) throws Exception {
+        String decStr = CipherFunc.DecryptText(s, key);
+        return decStr;
+    }
 
-
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,15 +75,15 @@ public class AddFriendActivity extends AppCompatActivity {
             String s;
             if((s=buf.readLine()) != null){
                 String[] arr = s.split(" ");
-                friend_name_1.setText(arr[0]); friend_phone_1.setText(arr[1]);
+                friend_name_1.setText(decFunc(arr[0])); friend_phone_1.setText(decFunc(arr[1]));
             }
             if((s=buf.readLine()) != null){
                 String[] arr = s.split(" ");
-                friend_name_2.setText(arr[0]); friend_phone_2.setText(arr[1]);
+                friend_name_2.setText(decFunc(arr[0])); friend_phone_2.setText(decFunc(arr[1]));
             }
             if((s=buf.readLine()) != null){
                 String[] arr = s.split(" ");
-                friend_name_3.setText(arr[0]); friend_phone_3.setText(arr[1]);
+                friend_name_3.setText(decFunc(arr[0])); friend_phone_3.setText(decFunc(arr[1]));
             }
 
             fr.close();
@@ -77,11 +93,13 @@ public class AddFriendActivity extends AppCompatActivity {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
 
         //등록 버튼 클릭 시
         btn_register_friend.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View register) {
 
@@ -100,6 +118,8 @@ public class AddFriendActivity extends AppCompatActivity {
                         try {
                             req.AddToLocalDB(file);
                         } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
 
