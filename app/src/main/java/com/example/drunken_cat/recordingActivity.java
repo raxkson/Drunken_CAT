@@ -10,11 +10,13 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 import android.widget.VideoView;
 import android.widget.MediaController;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -23,6 +25,9 @@ import androidx.core.content.ContextCompat;
 import java.io.File;
 import java.io.IOException;
 import 	androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 public class recordingActivity extends AppCompatActivity{
 
     MediaRecorder record;
@@ -57,6 +62,36 @@ public class recordingActivity extends AppCompatActivity{
                 //stopRecord();
             }
         });
+
+        //네비게이션
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.main_bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Intent intent;
+                finish();
+                switch (item.getItemId()) {
+                    case R.id.bottom_nav_1:
+                        intent = new Intent(getApplicationContext(), MapActivity.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.bottom_nav_2:
+                        intent = new Intent(getApplicationContext(), AddFriendActivity.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.bottom_nav_3:
+                        intent = new Intent(getApplicationContext(), ProxyDriverActivity.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.bottom_nav_4:
+                        intent = new Intent(getApplicationContext(), recordingActivity.class);
+                        startActivity(intent);
+                        break;
+                }
+                return true;
+            }
+        });
+
     }
     protected void onDestroy(Bundle savedInstanceState) {
         super.onDestroy();

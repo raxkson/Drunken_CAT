@@ -1,26 +1,28 @@
 package com.example.drunken_cat;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 public class ProxyDriverActivity extends AppCompatActivity {
 
-    private ImageButton btn_back,btn_kakao;
 
-    Button btn_proxy1,btn_proxy2,btn_proxy3,btn_proxy4,btn_proxy5,btn_proxy6,btn_proxy7,btn_proxy8,btn_proxy9,btn_proxy10;
+    Button btn_kakao,btn_proxy1,btn_proxy2,btn_proxy3,btn_proxy4,btn_proxy5,btn_proxy6,btn_proxy7,btn_proxy8,btn_proxy9,btn_proxy10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_proxydriver);
-        btn_back = findViewById(R.id.btn_back);
         btn_kakao = findViewById(R.id.btn_kakao);
         btn_proxy1 = findViewById(R.id.btn_proxy1);
         btn_proxy2 = findViewById(R.id.btn_proxy2);
@@ -104,16 +106,37 @@ public class ProxyDriverActivity extends AppCompatActivity {
         });
 
 
-
-
-
-
-        btn_back.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View Add_Main) {
-                Intent back_intent = new Intent(ProxyDriverActivity.this, MapActivity.class);
-                startActivity(back_intent);
+        //네비게이션
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.main_bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Intent intent;
+                finish();
+                switch (item.getItemId()) {
+                    case R.id.bottom_nav_1:
+                        intent = new Intent(getApplicationContext(), MapActivity.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.bottom_nav_2:
+                        intent = new Intent(getApplicationContext(), AddFriendActivity.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.bottom_nav_3:
+                        intent = new Intent(getApplicationContext(), ProxyDriverActivity.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.bottom_nav_4:
+                        intent = new Intent(getApplicationContext(), recordingActivity.class);
+                        startActivity(intent);
+                        break;
+                }
+                return true;
             }
         });
+
+
+
 
         btn_kakao.setOnClickListener(new View.OnClickListener() {
             public void onClick(View Proxy_Kakao) {
