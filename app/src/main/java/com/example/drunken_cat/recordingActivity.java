@@ -22,8 +22,9 @@ import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.io.IOException;
-
+import 	androidx.appcompat.app.AppCompatActivity;
 public class recordingActivity extends AppCompatActivity{
+
     MediaRecorder record;
     String filename="";
     MediaPlayer player;
@@ -46,12 +47,14 @@ public class recordingActivity extends AppCompatActivity{
 
         findViewById(R.id.record_start).setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
-                startRecord();
+                startService(new Intent(getApplicationContext(), VoiceBackgroundActivity.class));//추가
+               //startRecord();
             }
         });
         findViewById(R.id.record_stop).setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
-                stopRecord();
+                stopService(new Intent(getApplicationContext(), VoiceBackgroundActivity.class));// 추가
+                //stopRecord();
             }
         });
     }
@@ -117,5 +120,11 @@ public class recordingActivity extends AppCompatActivity{
             player.release();
             player = null;
         }
+    }
+
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
     }
 }
