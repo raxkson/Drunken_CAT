@@ -285,6 +285,7 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 Intent intent;
+                finish();
                 switch (item.getItemId()) {
                     case R.id.bottom_nav_1:
                         intent = new Intent(getApplicationContext(),  MapActivity.class);
