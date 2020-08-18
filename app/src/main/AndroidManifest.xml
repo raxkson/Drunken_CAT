@@ -43,6 +43,8 @@
         <activity android:name=".MapNavigationActivity" />
         <activity android:name=".AddFriendActivity"/>
         <activity android:name=".ProxyDriverActivity"/>
+        <activity android:name=".SplashActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <service android:name=".VoiceBackgroundActivity"/>
         <!--meta-data for Kakao Map API-->
         <meta-data android:name="com.kakao.sdk.AppKey" android:value="5a0c14eca0395a9f04fc2997f26ff3b1"/>

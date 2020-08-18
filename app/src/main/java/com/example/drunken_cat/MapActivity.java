@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -106,6 +107,8 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_map);
+        Intent intent = new Intent(this, SplashActivity.class);
+        startActivity(intent);
         bus.register(this); //정류소 등록
         if (!checkLocationServicesStatus()) {
             showDialogForLocationServiceSetting();
