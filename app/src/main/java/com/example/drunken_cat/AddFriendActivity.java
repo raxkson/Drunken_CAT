@@ -135,14 +135,5 @@ public class AddFriendActivity extends AppCompatActivity {
 
         //불러오기 버튼
 
-
-
-        btn_back.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View AddtoMain) {
-                Intent back_intent = new Intent(AddFriendActivity.this, MapActivity.class);
-                startActivity(back_intent);
-            }
-        });
-
     }
 }
