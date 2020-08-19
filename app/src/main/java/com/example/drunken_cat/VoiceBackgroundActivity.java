@@ -27,7 +27,11 @@ public class VoiceBackgroundActivity extends Service {
     @Override
     public void onCreate(){
         super.onCreate();
-
+        if (record != null) {
+            record.stop();
+            record.release();
+            record = null;
+        }
         File file = new File(getApplicationContext().getFilesDir(),"record.mp4");
         filename = file.getAbsolutePath();
 

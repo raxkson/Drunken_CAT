@@ -1,10 +1,8 @@
 package com.example.drunken_cat;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
@@ -12,7 +10,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -20,13 +18,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-import android.location.LocationManager;
-
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,7 +32,6 @@ import com.example.drunken_cat.model.category_search.CategoryResult;
 import com.example.drunken_cat.model.category_search.Document;
 import com.example.drunken_cat.utils.BusProvider;
 import com.example.drunken_cat.utils.IntentKey;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.shashank.sony.fancytoastlib.FancyToast;
 import com.squareup.otto.Bus;
@@ -49,23 +41,30 @@ import net.daum.mf.map.api.MapCircle;
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapView;
-import net.daum.mf.map.api.MapReverseGeoCoder;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import android.view.inputmethod.InputMethodManager;
 
-public class MapActivity extends AppCompatActivity implements  MapView.MapViewEventListener, MapView.POIItemEventListener, MapView.OpenAPIKeyAuthenticationResultListener, View.OnClickListener, MapView.CurrentLocationEventListener {
+import static android.content.Context.INPUT_METHOD_SERVICE;
+
+
+public class MapActivity extends Fragment implements  MapView.MapViewEventListener, MapView.POIItemEventListener, MapView.OpenAPIKeyAuthenticationResultListener, View.OnClickListener, MapView.CurrentLocationEventListener {
     final static String TAG = "MapTAG";
 
-    private static final int GPS_ENABLE_REQUEST_CODE = 2001;
-    private static final int PERMISSIONS_REQUEST_CODE = 100;
-    String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION};
+
     //xml
     MapView mMapView;
     ViewGroup mMapViewContainer;
@@ -100,213 +99,40 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
 
     MapPOIItem searchMarker = new MapPOIItem();
 
-
+    private InputMethodManager imm;
+    private View view;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        setContentView(R.layout.activity_map);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+       view = inflater.inflate(R.layout.activity_map, container, false);
+
+
         bus.register(this); //정류소 등록
-        if (!checkLocationServicesStatus()) {
-            showDialogForLocationServiceSetting();
-        }else {
-            checkRunTimePermission();
-        }
-    }
-
-    /*
-     * ActivityCompat.requestPermissions를 사용한 퍼미션 요청의 결과를 리턴받는 메소드입니다.
-     */
-    @Override
-    public void onRequestPermissionsResult(int permsRequestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grandResults) {
-
-        if ( permsRequestCode == PERMISSIONS_REQUEST_CODE && grandResults.length == REQUIRED_PERMISSIONS.length) {
-
-            // 요청 코드가 PERMISSIONS_REQUEST_CODE 이고, 요청한 퍼미션 개수만큼 수신되었다면
-
-            boolean check_result = true;
-
-
-            // 모든 퍼미션을 허용했는지 체크합니다.
-
-            for (int result : grandResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    check_result = false;
-                    break;
-                }
-            }
-
-
-            if ( check_result ) {
-                Log.d("@@@", "start");
-                //위치 값을 가져올 수 있음
-                initView();
-                //mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeading);
-            }
-            else {
-                // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다.2 가지 경우가 있습니다.
-
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])) {
-
-                    Toast.makeText(MapActivity.this, "퍼미션이 거부되었습니다. 앱을 다시 실행하여 퍼미션을 허용해주세요.", Toast.LENGTH_LONG).show();
-                    finish();
-
-
-                }else {
-
-                    Toast.makeText(MapActivity.this, "퍼미션이 거부되었습니다. 설정(앱 정보)에서 퍼미션을 허용해야 합니다. ", Toast.LENGTH_LONG).show();
-
-                }
-            }
-
-        }
-    }
-
-    void checkRunTimePermission(){
-
-        //런타임 퍼미션 처리
-        // 1. 위치 퍼미션을 가지고 있는지 체크합니다.
-        int hasFineLocationPermission = ContextCompat.checkSelfPermission(MapActivity.this,
-                Manifest.permission.ACCESS_FINE_LOCATION);
-
-
-        if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED ) {
-            // 2. 이미 퍼미션을 가지고 있다면
-            // ( 안드로이드 6.0 이하 버전은 런타임 퍼미션이 필요없기 때문에 이미 허용된 걸로 인식합니다.)
+        mSearchEdit = view.findViewById(R.id.map_et_search);
+        fab_open = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_open);
+        fab_close = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_close);
+        fab = view.findViewById(R.id.fab);
+        fab1 = view.findViewById(R.id.fab1);
+        fab2 = view.findViewById(R.id.fab2);
+        fab3 = view.findViewById(R.id.fab3);
+        searchDetailFab = view.findViewById(R.id.fab_detail);
+        stopTrackingFab = view.findViewById(R.id.fab_stop_tracking);
+        mLoaderLayout = view.findViewById(R.id.loaderLayout);
+        mMapView = new MapView(getActivity());
+        mMapViewContainer = view.findViewById(R.id.map_mv_mapcontainer);
+        mMapViewContainer.addView(mMapView);
+        recyclerView = view.findViewById(R.id.map_recyclerview);
             initView();
-        } else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요합니다. 2가지 경우(3-1, 4-1)가 있습니다.
-
-            // 3-1. 사용자가 퍼미션 거부를 한 적이 있는 경우에는
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MapActivity.this, REQUIRED_PERMISSIONS[0])) {
-
-                // 3-2. 요청을 진행하기 전에 사용자가에게 퍼미션이 필요한 이유를 설명해줄 필요가 있습니다.
-                Toast.makeText(MapActivity.this, "이 앱을 실행하려면 위치 접근 권한이 필요합니다.", Toast.LENGTH_LONG).show();
-                // 3-3. 사용자게에 퍼미션 요청을 합니다. 요청 결과는 onRequestPermissionResult에서 수신됩니다.
-                ActivityCompat.requestPermissions(MapActivity.this, REQUIRED_PERMISSIONS,
-                        PERMISSIONS_REQUEST_CODE);
-
-
-            } else {
-                // 4-1. 사용자가 퍼미션 거부를 한 적이 없는 경우에는 퍼미션 요청을 바로 합니다.
-                // 요청 결과는 onRequestPermissionResult에서 수신됩니다.
-                ActivityCompat.requestPermissions(MapActivity.this, REQUIRED_PERMISSIONS,
-                        PERMISSIONS_REQUEST_CODE);
-            }
-
-        }
-
-    }
-
-
-
-    //여기부터는 GPS 활성화를 위한 메소드들
-    private void showDialogForLocationServiceSetting() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
-        builder.setTitle("위치 서비스 비활성화");
-        builder.setMessage("앱을 사용하기 위해서는 위치 서비스가 필요합니다.\n"
-                + "위치 설정을 수정하실래요?");
-        builder.setCancelable(true);
-        builder.setPositiveButton("설정", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                Intent callGPSSettingIntent
-                        = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivityForResult(callGPSSettingIntent, GPS_ENABLE_REQUEST_CODE);
-            }
-        });
-        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
-            }
-        });
-        builder.create().show();
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode) {
-
-            case GPS_ENABLE_REQUEST_CODE:
-
-                //사용자가 GPS 활성 시켰는지 검사
-                if (checkLocationServicesStatus()) {
-                    if (checkLocationServicesStatus()) {
-
-                        Log.d("@@@", "onActivityResult : GPS 활성화 되있음");
-                        checkRunTimePermission();
-                        return;
-                    }
-                }
-
-                break;
-        }
-    }
-
-    public boolean checkLocationServicesStatus() {
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        return view;
     }
 
 
     private void initView() {
-        //binding
-        mSearchEdit = findViewById(R.id.map_et_search);
-        fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
-        fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
-        fab = findViewById(R.id.fab);
-        fab1 = findViewById(R.id.fab1);
-        fab2 = findViewById(R.id.fab2);
-        fab3 = findViewById(R.id.fab3);
-        searchDetailFab = findViewById(R.id.fab_detail);
-        stopTrackingFab = findViewById(R.id.fab_stop_tracking);
-        mLoaderLayout = findViewById(R.id.loaderLayout);
-        mMapView = new MapView(this);
-        mMapViewContainer = findViewById(R.id.map_mv_mapcontainer);
-        mMapViewContainer.addView(mMapView);
-        recyclerView = findViewById(R.id.map_recyclerview);
-        LocationAdapter locationAdapter = new LocationAdapter(documentArrayList, getApplicationContext(), mSearchEdit, recyclerView);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false); //레이아웃매니저 생성
-        recyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL)); //아래구분선 세팅
+
+        LocationAdapter locationAdapter = new LocationAdapter(documentArrayList, getActivity(), mSearchEdit, recyclerView);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false); //레이아웃매니저 생성
+        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL)); //아래구분선 세팅
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(locationAdapter);
-
-        //네비게이션
-        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.main_bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Intent intent;
-                finish();
-                switch (item.getItemId()) {
-                    case R.id.bottom_nav_1:
-                        intent = new Intent(getApplicationContext(),  MapActivity.class);
-                        startActivity(intent);
-                        break;
-                    case R.id.bottom_nav_2:
-                        intent = new Intent(getApplicationContext(), AddFriendActivity.class);
-                        startActivity(intent);
-                        break;
-                    case R.id.bottom_nav_3:
-                        intent = new Intent(getApplicationContext(), ProxyDriverActivity.class);
-                        startActivity(intent);
-                        break;
-                    case R.id.bottom_nav_4:
-                        intent = new Intent(getApplicationContext(), recordingActivity.class);
-                        startActivity(intent);
-                        break;
-                }
-                return true;
-            }
-        });
 
         //맵 리스너
         mMapView.setMapViewEventListener(this); // this에 MapView.MapViewEventListener 구현.
@@ -321,12 +147,15 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
         searchDetailFab.setOnClickListener(this);
         stopTrackingFab.setOnClickListener(this);
 
-        Toast.makeText(this, "맵을 로딩중입니다", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "맵을 로딩중입니다", Toast.LENGTH_SHORT).show();
 
         //맵 리스너 (현재위치 업데이트)
         mMapView.setCurrentLocationEventListener(this);
         //setCurrentLocationTrackingMode (지도랑 현재위치 좌표 찍어주고 따라다닌다.)
-        mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
+        if(        ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION) ==  PackageManager.PERMISSION_GRANTED)
+            mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
+
         mLoaderLayout.setVisibility(View.VISIBLE);
 
         // editText 검색 텍스처이벤트
@@ -391,23 +220,25 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
         mSearchEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FancyToast.makeText(getApplicationContext(), "검색리스트에서 장소를 선택해주세요", FancyToast.LENGTH_SHORT, FancyToast.INFO, true).show();
+                FancyToast.makeText(getActivity(), "검색리스트에서 장소를 선택해주세요", FancyToast.LENGTH_SHORT, FancyToast.INFO, true).show();
             }
         });
     }
+
+
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
         switch (id) {
             case R.id.fab:
-                FancyToast.makeText(this, "1번 버튼: 검색좌표 기준으로 1km 검색" +
+                FancyToast.makeText(getActivity(), "1번 버튼: 검색좌표 기준으로 1km 검색" +
                         "\n2번 버튼: 현재위치 기준으로 주변환경 검색" +
                         "\n3번 버튼: 현재위치 추적 및 업데이트", FancyToast.LENGTH_SHORT, FancyToast.INFO, true).show();
                 anim();
                 break;
             case R.id.fab1: //아래버튼에서부터 1~3임
-                FancyToast.makeText(this, "현재위치 추적 시작", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
+                FancyToast.makeText(getActivity(), "현재위치 추적 시작", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
                 searchDetailFab.setVisibility(View.GONE);
                 mLoaderLayout.setVisibility(View.VISIBLE);
                 isTrackingMode = true;
@@ -418,7 +249,7 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
                 break;
             case R.id.fab2:
                 isTrackingMode = false;
-                FancyToast.makeText(this, "현재위치기준 1km 검색 시작", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
+                FancyToast.makeText(getActivity(), "현재위치기준 1km 검색 시작", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
                 stopTrackingFab.setVisibility(View.GONE);
                 mLoaderLayout.setVisibility(View.VISIBLE);
                 anim();
@@ -439,13 +270,13 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
                     mMapView.addPOIItem(searchMarker);
                     requestSearchLocal(mSearchLng, mSearchLat);
                 } else {
-                    FancyToast.makeText(this, "검색 먼저 해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
+                    FancyToast.makeText(getActivity(), "검색 먼저 해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
                 }
                 mLoaderLayout.setVisibility(View.GONE);
                 break;
             case R.id.fab_detail:
-                FancyToast.makeText(this, "검색결과 상세보기", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
-                Intent detailIntent = new Intent(MapActivity.this, MapSearchDetailActivity.class);
+                FancyToast.makeText(getActivity(), "검색결과 상세보기", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
+                Intent detailIntent = new Intent(getActivity(), MapSearchDetailActivity.class);
                 detailIntent.putParcelableArrayListExtra(IntentKey.CATEGOTY_SEARCH_MODEL_EXTRA1, bigMartList);
                 detailIntent.putParcelableArrayListExtra(IntentKey.CATEGOTY_SEARCH_MODEL_EXTRA2, gs24List);
                 detailIntent.putParcelableArrayListExtra(IntentKey.CATEGOTY_SEARCH_MODEL_EXTRA3, schoolList);
@@ -455,7 +286,7 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
                 detailIntent.putParcelableArrayListExtra(IntentKey.CATEGOTY_SEARCH_MODEL_EXTRA7, hospitalList);
                 detailIntent.putParcelableArrayListExtra(IntentKey.CATEGOTY_SEARCH_MODEL_EXTRA8, pharmacyList);
                 detailIntent.putParcelableArrayListExtra(IntentKey.CATEGOTY_SEARCH_MODEL_EXTRA9, cafeList);
-                overridePendingTransition(R.anim.fade_in_splash, R.anim.fade_out_splash);
+                //overridePendingTransition(R.anim.fade_in_splash, R.anim.fade_out_splash);
                 startActivity(detailIntent);
                 Log.d(TAG, "fab_detail");
                 break;
@@ -463,7 +294,7 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
                 isTrackingMode = false;
                 mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
                 stopTrackingFab.setVisibility(View.GONE);
-                FancyToast.makeText(this, "현재위치 추적 종료", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
+                FancyToast.makeText(getActivity(), "현재위치 추적 종료", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
                 break;
         }
     }
@@ -864,12 +695,12 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
     public void showMap(Uri geoLocation) {
         Intent intent;
         try {
-            FancyToast.makeText(getApplicationContext(), "카카오맵으로 길찾기를 시도합니다.", FancyToast.LENGTH_SHORT, FancyToast.INFO, true).show();
+            FancyToast.makeText(getActivity(), "카카오맵으로 길찾기를 시도합니다.", FancyToast.LENGTH_SHORT, FancyToast.INFO, true).show();
             intent = new Intent(Intent.ACTION_VIEW, geoLocation);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } catch (Exception e) {
-            FancyToast.makeText(getApplicationContext(), "길찾기에는 카카오맵이 필요합니다. 다운받아주시길 바랍니다.", FancyToast.LENGTH_SHORT, FancyToast.INFO, true).show();
+            FancyToast.makeText(getActivity(), "길찾기에는 카카오맵이 필요합니다. 다운받아주시길 바랍니다.", FancyToast.LENGTH_SHORT, FancyToast.INFO, true).show();
             intent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://play.google.com/store/apps/details?id=net.daum.android.map&hl=ko"));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
@@ -885,11 +716,11 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
     public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem, MapPOIItem.CalloutBalloonButtonType calloutBalloonButtonType) {
         double lat = mapPOIItem.getMapPoint().getMapPointGeoCoord().latitude;
         double lng = mapPOIItem.getMapPoint().getMapPointGeoCoord().longitude;
-        Toast.makeText(this, mapPOIItem.getItemName(), Toast.LENGTH_SHORT).show();
-        CFAlertDialog.Builder builder = new CFAlertDialog.Builder(this);
+        Toast.makeText(getActivity(), mapPOIItem.getItemName(), Toast.LENGTH_SHORT).show();
+        CFAlertDialog.Builder builder = new CFAlertDialog.Builder(getActivity());
         builder.setDialogStyle(CFAlertDialog.CFAlertStyle.ALERT);
         builder.setTitle("선택해주세요");
-        builder.setSingleChoiceItems(new String[]{"장소 정보", "길찾기"}, 2, new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(new String[]{"장소 정보", "길찾기", "목적지 등록"}, 3, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int index) {
                 if (index == 0) {
@@ -901,7 +732,7 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
                         public void onResponse(@NotNull Call<CategoryResult> call, @NotNull Response<CategoryResult> response) {
                             mLoaderLayout.setVisibility(View.GONE);
                             if (response.isSuccessful()) {
-                                Intent intent = new Intent(MapActivity.this, PlaceDetailActivity.class);
+                                Intent intent = new Intent(getActivity(), PlaceDetailActivity.class);
                                 assert response.body() != null;
                                 intent.putExtra(IntentKey.PLACE_SEARCH_DETAIL_EXTRA, response.body().getDocuments().get(0));
                                 startActivity(intent);
@@ -910,14 +741,35 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
 
                         @Override
                         public void onFailure(Call<CategoryResult> call, Throwable t) {
-                            FancyToast.makeText(getApplicationContext(), "해당장소에 대한 상세정보는 없습니다.", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
+                            FancyToast.makeText(getActivity(), "해당장소에 대한 상세정보는 없습니다.", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
                             mLoaderLayout.setVisibility(View.GONE);
-                            Intent intent = new Intent(MapActivity.this, PlaceDetailActivity.class);
+                            Intent intent = new Intent(getActivity(), PlaceDetailActivity.class);
                             startActivity(intent);
                         }
                     });
                 } else if (index == 1) {
                     showMap(Uri.parse("daummaps://route?sp=" + mCurrentLat + "," + mCurrentLng + "&ep=" + lat + "," + lng + "&by=FOOT"));
+                } else if (index == 2) {
+                    FancyToast.makeText(getActivity(), "목적지가 등록되었습니다.", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
+                    mLoaderLayout.setVisibility(View.GONE);
+                    dialogInterface.dismiss();
+                    final File file = new File(getActivity().getFilesDir(), "Destination.txt");
+                    try {
+                        String dest = lat + ", " + lng;
+                        FileWriter fw = new FileWriter(file ,true);
+                        BufferedWriter buff = new BufferedWriter(fw);
+                        if (file.exists())
+                            file.delete();
+                        buff.write(dest);
+                        try {
+                            buff.close();
+                            fw.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -964,9 +816,7 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
         Log.d(TAG, "현재위치 => " + mCurrentLat + "  " + mCurrentLng);
         mLoaderLayout.setVisibility(View.GONE);
         //트래킹 모드가 아닌 단순 현재위치 업데이트일 경우, 한번만 위치 업데이트하고 트래킹을 중단시키기 위한 로직
-        if (!isTrackingMode) {
-            mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
-        }
+        mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
     }
 
     @Override
@@ -988,7 +838,7 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
 
     @Subscribe //검색예시 클릭시 이벤트 오토버스
     public void search(Document document) {//public항상 붙여줘야함
-        FancyToast.makeText(getApplicationContext(), document.getPlaceName() + " 검색", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
+        FancyToast.makeText(getActivity(), document.getPlaceName() + " 검색", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
         mSearchName = document.getPlaceName();
         mSearchLng = Double.parseDouble(document.getX());
         mSearchLat = Double.parseDouble(document.getY());
@@ -1003,12 +853,23 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
         //마커 드래그 가능하게 설정
         searchMarker.setDraggable(true);
         mMapView.addPOIItem(searchMarker);
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
 
     @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+        bus.unregister(this);
+        if (isTrackingMode) {
+            mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
+            mMapView.setShowCurrentLocationMarker(false);
+        }
+    }
+/*    @Override
     public void finish() {
-        super.finish();
+        getActivity().finish();
         bus.unregister(this); //이액티비티 떠나면 정류소 해제해줌
     }
 
@@ -1019,10 +880,5 @@ public class MapActivity extends AppCompatActivity implements  MapView.MapViewEv
             mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
             mMapView.setShowCurrentLocationMarker(false);
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
+    }*/
 }
