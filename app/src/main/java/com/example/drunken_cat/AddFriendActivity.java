@@ -3,8 +3,10 @@ package com.example.drunken_cat;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,8 +14,10 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -37,7 +41,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import net.daum.mf.map.api.MapView;
 
-public class AddFriendActivity extends AppCompatActivity {
+public class AddFriendActivity extends Fragment {
 
     private ImageButton btn_back;
     private String key = "DrunkenCAT";
@@ -54,20 +58,19 @@ public class AddFriendActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_addfriend);
-        final File file = new File(getApplicationContext().getFilesDir(),"Friend.txt");
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_addfriend, container, false);
+        final File file = new File(getActivity().getFilesDir(), "Friend.txt");
         /* 귀가천사 변수 선언 및 init */
 
-        friend_name_1 = findViewById(R.id.friend_name_1);
-        friend_phone_1 = findViewById(R.id.friend_phone_1);
-        friend_name_2 = findViewById(R.id.friend_name_2);
-        friend_phone_2 = findViewById(R.id.friend_phone_2);
-        friend_name_3 = findViewById(R.id.friend_name_3);
-        friend_phone_3 = findViewById(R.id.friend_phone_3);
+        friend_name_1 = view.findViewById(R.id.friend_name_1);
+        friend_phone_1 = view.findViewById(R.id.friend_phone_1);
+        friend_name_2 = view.findViewById(R.id.friend_name_2);
+        friend_phone_2 = view.findViewById(R.id.friend_phone_2);
+        friend_name_3 = view.findViewById(R.id.friend_name_3);
+        friend_phone_3 = view.findViewById(R.id.friend_phone_3);
 
-        btn_register_friend = findViewById(R.id.btn_register_friend);
+        btn_register_friend = (Button) view.findViewById(R.id.btn_register_friend);
 
 
         //등록된 정보 로드
@@ -77,21 +80,24 @@ public class AddFriendActivity extends AppCompatActivity {
 
         try {
             FileReader fr = new FileReader(file);
-            BufferedReader buf= new BufferedReader(fr);
+            BufferedReader buf = new BufferedReader(fr);
 
 
             String s;
-            if((s=buf.readLine()) != null){
+            if ((s = buf.readLine()) != null) {
                 String[] arr = s.split(" ");
-                friend_name_1.setText(decFunc(arr[0])); friend_phone_1.setText(decFunc(arr[1]));
+                friend_name_1.setText(decFunc(arr[0]));
+                friend_phone_1.setText(decFunc(arr[1]));
             }
-            if((s=buf.readLine()) != null){
+            if ((s = buf.readLine()) != null) {
                 String[] arr = s.split(" ");
-                friend_name_2.setText(decFunc(arr[0])); friend_phone_2.setText(decFunc(arr[1]));
+                friend_name_2.setText(decFunc(arr[0]));
+                friend_phone_2.setText(decFunc(arr[1]));
             }
-            if((s=buf.readLine()) != null){
+            if ((s = buf.readLine()) != null) {
                 String[] arr = s.split(" ");
-                friend_name_3.setText(decFunc(arr[0])); friend_phone_3.setText(decFunc(arr[1]));
+                friend_name_3.setText(decFunc(arr[0]));
+                friend_phone_3.setText(decFunc(arr[1]));
             }
 
             fr.close();
@@ -105,39 +111,8 @@ public class AddFriendActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
-
-
-            //네비게이션
-        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.main_bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Intent intent;
-                finish();
-                switch (item.getItemId()) {
-                    case R.id.bottom_nav_1:
-                        intent = new Intent(getApplicationContext(), MapActivity.class);
-                        startActivity(intent);
-                        break;
-                    case R.id.bottom_nav_2:
-                        intent = new Intent(getApplicationContext(), AddFriendActivity.class);
-                        startActivity(intent);
-                        break;
-                    case R.id.bottom_nav_3:
-                        intent = new Intent(getApplicationContext(), ProxyDriverActivity.class);
-                        startActivity(intent);
-                        break;
-                    case R.id.bottom_nav_4:
-                        intent = new Intent(getApplicationContext(), recordingActivity.class);
-                        startActivity(intent);
-                        break;
-                }
-                return true;
-            }
-        });
-
         //등록 버튼 클릭 시
+
         btn_register_friend.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -146,12 +121,12 @@ public class AddFriendActivity extends AppCompatActivity {
                 EditText[] mEtNameArr = {friend_name_1, friend_name_2, friend_name_3};
                 EditText[] mEtPhoneArr = {friend_phone_1, friend_phone_2, friend_phone_3};
 
-                if(file.exists())
+                if (file.exists())
                     file.delete();
 
                 for (int i = 0; i < 3; i++) {
                     if (mEtNameArr[i].getText().toString().equals("") || mEtPhoneArr[i].getText().toString().equals("")) {
-                        Toast.makeText(getApplicationContext(), "입력정보를 확인해주세요.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "입력정보를 확인해주세요.", Toast.LENGTH_SHORT).show();
                     } else {
                         AddFriend req = new AddFriend(mEtNameArr[i].getText().toString(), mEtPhoneArr[i].getText().toString());
 
@@ -165,15 +140,9 @@ public class AddFriendActivity extends AppCompatActivity {
 
                     }
                 }
-                //Button btn = (Button) findViewById(R.id.btn_register_friend);
-              //  btn.setEnabled(false);
-
-
-
             }
         });
 
-        //불러오기 버튼
-
+        return view;
     }
 }

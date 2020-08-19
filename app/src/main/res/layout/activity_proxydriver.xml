@@ -16,13 +16,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
-            android:layout_marginRight="15sp"
+            android:layout_marginBottom="10dp"
             android:layout_gravity="center"
             android:text="대리운전"
             android:textStyle="bold"
             android:fontFamily="@font/binggraemelona"
-            android:textSize="50dp" />
+            android:textSize="40dp" />
 
             <!--
             <ImageButton
@@ -131,21 +130,5 @@
             android:text="제주" />
 
     </LinearLayout>
-
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/main_bottom_navigation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:background="@color/colorWhiteBlue"
-                app:itemIconTint="@color/colorWhite"
-                app:itemTextColor="@color/colorWhite"
-                app:layout_behavior="tech.thdev.app.view.BottomNavigationBehavior"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_fl_container"
-                app:menu="@menu/bottom_menu"
-                android:layout_marginTop="10dp"/>
 
 </FrameLayout>
