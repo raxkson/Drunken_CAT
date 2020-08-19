@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 import android.widget.VideoView;
 import android.widget.MediaController;
@@ -45,11 +46,12 @@ public class recordingActivity extends Fragment {
         permission();
         Log.d("recording","Save file : " + filename);
 
+
+
         // start
         view.findViewById(R.id.record_start).setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
                 getActivity().startService(new Intent(getActivity(), VoiceBackgroundActivity.class));//추가
-               //startRecord();
             }
         });
         // stop
