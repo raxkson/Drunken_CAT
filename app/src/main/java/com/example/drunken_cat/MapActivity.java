@@ -43,6 +43,14 @@ import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapView;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -712,7 +720,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
         CFAlertDialog.Builder builder = new CFAlertDialog.Builder(getActivity());
         builder.setDialogStyle(CFAlertDialog.CFAlertStyle.ALERT);
         builder.setTitle("선택해주세요");
-        builder.setSingleChoiceItems(new String[]{"장소 정보", "길찾기"}, 2, new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(new String[]{"장소 정보", "길찾기", "목적지 등록"}, 3, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int index) {
                 if (index == 0) {
@@ -741,6 +749,27 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                     });
                 } else if (index == 1) {
                     showMap(Uri.parse("daummaps://route?sp=" + mCurrentLat + "," + mCurrentLng + "&ep=" + lat + "," + lng + "&by=FOOT"));
+                } else if (index == 2) {
+                    FancyToast.makeText(getActivity(), "목적지가 등록되었습니다.", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
+                    mLoaderLayout.setVisibility(View.GONE);
+                    dialogInterface.dismiss();
+                    final File file = new File(getActivity().getFilesDir(), "Destination.txt");
+                    try {
+                        String dest = lat + ", " + lng;
+                        FileWriter fw = new FileWriter(file ,true);
+                        BufferedWriter buff = new BufferedWriter(fw);
+                        if (file.exists())
+                            file.delete();
+                        buff.write(dest);
+                        try {
+                            buff.close();
+                            fw.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
