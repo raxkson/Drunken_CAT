@@ -40,6 +40,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:19.1.0'
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
     implementation 'com.google.firebase:firebase-core:17.2.1'
+    implementation 'androidx.security:security-crypto:1.0.0-alpha02'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
@@ -84,5 +85,5 @@ dependencies {
     //dialog
     implementation 'com.crowdfire.cfalertdialog:cfalertdialog:1.1.0'
 
-
+    compile 'com.snatik:storage:2.1.0'
 }

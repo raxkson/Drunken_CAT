@@ -1,67 +1,36 @@
 package com.example.drunken_cat;
 
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import com.example.drunken_cat.CipherFunc;
-import com.example.drunken_cat.adapter.LocationAdapter;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import net.daum.mf.map.api.MapView;
+import com.snatik.storage.EncryptConfiguration;
+import com.snatik.storage.Storage;
 
 public class AddFriendActivity extends Fragment {
 
-    private ImageButton btn_back;
-    private String key = "DrunkenCAT";
     EditText friend_name_1, friend_phone_1,
             friend_name_2, friend_phone_2,
             friend_name_3, friend_phone_3;
 
     Button btn_register_friend;
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public String decFunc(String s) throws Exception {
-        String decStr = CipherFunc.DecryptText(s, key);
-        return decStr;
-    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_addfriend, container, false);
-        final File file = new File(getActivity().getFilesDir(), "Friend.txt");
         /* 귀가천사 변수 선언 및 init */
+
 
         friend_name_1 = view.findViewById(R.id.friend_name_1);
         friend_phone_1 = view.findViewById(R.id.friend_phone_1);
@@ -72,77 +41,46 @@ public class AddFriendActivity extends Fragment {
 
         btn_register_friend = (Button) view.findViewById(R.id.btn_register_friend);
 
+        //encrypt and decrypt file
+        String IVX = "abcdefghijklmnop"; // 16 lenght - not secret
+        String SECRET_KEY = "secret1234567890"; // 16 lenght - secret
+        byte[] SALT = "0000111100001111".getBytes(); // random 16 bytes array
+        EncryptConfiguration configuration = new EncryptConfiguration.Builder()
+                .setEncryptContent(IVX, SECRET_KEY, SALT)
+                .build();
 
-        //등록된 정보 로드
-        StringBuffer buffer = new StringBuffer();
-        String data = null;
-        FileInputStream fis = null;
+        Storage storage = new Storage(getContext());
+        storage.setEncryptConfiguration(configuration);
+        String path = storage.getInternalFilesDirectory();
+        String Filepath = path + "Friend.txt";
 
-        try {
-            FileReader fr = new FileReader(file);
-            BufferedReader buf = new BufferedReader(fr);
-
-
-            String s;
-            if ((s = buf.readLine()) != null) {
-                String[] arr = s.split(" ");
-                friend_name_1.setText(decFunc(arr[0]));
-                friend_phone_1.setText(decFunc(arr[1]));
-            }
-            if ((s = buf.readLine()) != null) {
-                String[] arr = s.split(" ");
-                friend_name_2.setText(decFunc(arr[0]));
-                friend_phone_2.setText(decFunc(arr[1]));
-            }
-            if ((s = buf.readLine()) != null) {
-                String[] arr = s.split(" ");
-                friend_name_3.setText(decFunc(arr[0]));
-                friend_phone_3.setText(decFunc(arr[1]));
-            }
-
-            fr.close();
-            buf.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        boolean fileExists = storage.isFileExist(Filepath);
+        if(fileExists) {
+            String content = storage.readTextFile(Filepath);
+            String[] text = content.split("☎");
+            friend_name_1.setText(text[0]);
+            friend_phone_1.setText(text[1]);
+            friend_name_2.setText(text[2]);
+            friend_phone_2.setText(text[3]);
+            friend_name_3.setText(text[4]);
+            friend_phone_3.setText(text[5]);
         }
 
         //등록 버튼 클릭 시
-
         btn_register_friend.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View register) {
-
                 EditText[] mEtNameArr = {friend_name_1, friend_name_2, friend_name_3};
                 EditText[] mEtPhoneArr = {friend_phone_1, friend_phone_2, friend_phone_3};
-
-                if (file.exists())
-                    file.delete();
-
-                for (int i = 0; i < 3; i++) {
-                    if (mEtNameArr[i].getText().toString().equals("") || mEtPhoneArr[i].getText().toString().equals("")) {
-                        Toast.makeText(getActivity(), "입력정보를 확인해주세요.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        AddFriend req = new AddFriend(mEtNameArr[i].getText().toString(), mEtPhoneArr[i].getText().toString());
-
-                        try {
-                            req.AddToLocalDB(file);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                    }
+                String name_phone = friend_name_1.getText() + "☎" + friend_phone_1.getText() + "☎" + friend_name_2.getText() + "☎" + friend_phone_2.getText() + "☎" + friend_name_3.getText() + "☎" + friend_phone_3.getText();
+                if(fileExists){
+                    storage.deleteFile(Filepath);
                 }
+                storage.createFile(Filepath, name_phone);
+                Toast.makeText(getActivity(), "등록이 완료되었습니다.", Toast.LENGTH_SHORT).show();
             }
         });
-
         return view;
     }
 }
