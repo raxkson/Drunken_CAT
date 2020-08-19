@@ -23,9 +23,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -34,7 +38,7 @@ import java.util.Date;
 import java.util.List;
 
 //SMS 내용 어떻게 할건지
-//목적지 읽기
+//목적지 읽기 Destination.txt
 //도착하면 종료
 
 public class GoHome extends AppCompatActivity {
@@ -46,8 +50,8 @@ public class GoHome extends AppCompatActivity {
     boolean isThread = false;
     double cur_longitude = 1000;
     double cur_latitude = 1000;
-    double dst_longitude = 37.1;
-    double dst_latitude = 50.3;
+    double dst_longitude = 126.644383;
+    double dst_latitude = 37.386208;
     double bef_distance = 0;
     double cur_distance = 0;
 
@@ -105,6 +109,42 @@ public class GoHome extends AppCompatActivity {
         btn_loc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                final File file_dst = new File(getApplicationContext().getFilesDir(), "Destination.txt");
+
+                StringBuffer buffer = new StringBuffer();
+                String data = null;
+                FileInputStream fis = null;
+
+
+
+                try {
+                    FileReader fr = new FileReader(file_dst);
+                    BufferedReader buf= new BufferedReader(fr);
+
+                    //System.out.println("before");
+
+                    for(int i = 0; i < 3; i++){
+                        String s;
+                        if((s=buf.readLine()) != null){
+                            String[] arr = s.split(" ");
+                            //System.out.println("[**]     :"+arr[0]);
+                            dst_latitude = Double.parseDouble(arr[0]);
+                            dst_longitude = Double.parseDouble(arr[1]);
+                            //Toast.makeText(getApplicationContext(),arr[0],Toast.LENGTH_SHORT);
+                            //Toast.makeText(getApplicationContext(),arr[1],Toast.LENGTH_SHORT);
+                        }
+                    }
+
+
+                    fr.close();
+                    buf.close();
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 isThread = true;
                 thread =  new Thread(){
                     public void run(){
@@ -129,6 +169,9 @@ public class GoHome extends AppCompatActivity {
         @Override
         public void handleMessage(@NonNull Message msg) {
             final File file = new File(getApplicationContext().getFilesDir(), "Location.txt");
+
+
+
             FileWriter fw = null;
 
             try {
@@ -223,18 +266,60 @@ public class GoHome extends AppCompatActivity {
                 if(cur_distance < 1){//목적지 도착
                     Toast.makeText(getApplicationContext(), "목적지 도착", Toast.LENGTH_SHORT).show();
                     isThread = false;
+
                 }
                 if(cur_distance > bef_distance + 1){//SOS
                     Toast.makeText(getApplicationContext(), "경로이탈", Toast.LENGTH_SHORT).show();
-                    /*try{
+                    final File file_info = new File(getApplicationContext().getFilesDir(), "Friend.txt");
+                    StringBuffer buffer = new StringBuffer();
+                    String data = null;
+                    FileInputStream fis = null;
+
+                    String[] name = null;
+                    String[] number = null;
+
+                    try {
+                        FileReader fr = new FileReader(file_info);
+                        BufferedReader buf= new BufferedReader(fr);
+
+                        //System.out.println("before");
+
+                        for(int i = 0; i < 3; i++){
+                            String s;
+                            if((s=buf.readLine()) != null){
+                                String[] arr = s.split(" ");
+                                //System.out.println("[**]     :"+arr[0]);
+                                name[i] = arr[0];
+                                number[i] = arr[1];
+                                //Toast.makeText(getApplicationContext(),arr[0],Toast.LENGTH_SHORT);
+                                //Toast.makeText(getApplicationContext(),arr[1],Toast.LENGTH_SHORT);
+                            }
+                        }
+
+
+                        fr.close();
+                        buf.close();
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    try{
                         SmsManager smsManager = SmsManager.getDefault();
-                        smsManager.sendTextMessage("010", null, "테스트", null, null);
+                        for(int i = 0; i < 3; i++){
+                            smsManager.sendTextMessage(number[i], null, "테스트1", null, null);
+                        }
                         Toast.makeText(getApplicationContext(), "success", Toast.LENGTH_SHORT).show();
                     } catch(Exception e){
                         Toast.makeText(getApplicationContext(), "SMS failed", Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     }
-                    */
+
+
+
                 }
                 bef_distance = cur_distance;
                 lm.removeUpdates(mLocationListener);
@@ -263,7 +348,6 @@ public class GoHome extends AppCompatActivity {
 
 
         }
-
         @Override
         public void onStatusChanged(String s, int i, Bundle bundle) {
 
