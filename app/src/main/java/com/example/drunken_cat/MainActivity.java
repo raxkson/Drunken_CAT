@@ -21,6 +21,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
+    //back button
+    private BackButtonClick BackButtonClick;
+
+
     //location permission
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -40,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
 
+        // 뒤로가기 2번 종료
+        BackButtonClick = new BackButtonClick(this);
+
+
         if (!checkLocationServicesStatus()) {
             showDialogForLocationServiceSetting();
         }else {
@@ -52,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
         transaction.replace(R.id.frameLayout, fragmentMap).commitAllowingStateLoss();
     }
 
+    public void onBackPressed(){
+        BackButtonClick.onBackPressed();
+    }
     class ItemSelectedListener implements BottomNavigationView.OnNavigationItemSelectedListener{
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
