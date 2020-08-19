@@ -48,6 +48,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import android.view.inputmethod.InputMethodManager;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
+
 
 public class MapActivity extends Fragment implements  MapView.MapViewEventListener, MapView.POIItemEventListener, MapView.OpenAPIKeyAuthenticationResultListener, View.OnClickListener, MapView.CurrentLocationEventListener {
     final static String TAG = "MapTAG";
@@ -87,11 +91,11 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
 
     MapPOIItem searchMarker = new MapPOIItem();
 
-
-
+    private InputMethodManager imm;
+    private View view;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-       View view = inflater.inflate(R.layout.activity_map, container, false);
+       view = inflater.inflate(R.layout.activity_map, container, false);
 
 
         bus.register(this); //정류소 등록
@@ -820,6 +824,8 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
         //마커 드래그 가능하게 설정
         searchMarker.setDraggable(true);
         mMapView.addPOIItem(searchMarker);
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
 
