@@ -1,20 +1,16 @@
 package com.example.drunken_cat;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -22,13 +18,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-import android.location.LocationManager;
-
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -43,7 +32,6 @@ import com.example.drunken_cat.model.category_search.CategoryResult;
 import com.example.drunken_cat.model.category_search.Document;
 import com.example.drunken_cat.utils.BusProvider;
 import com.example.drunken_cat.utils.IntentKey;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.shashank.sony.fancytoastlib.FancyToast;
 import com.squareup.otto.Bus;
@@ -53,12 +41,9 @@ import net.daum.mf.map.api.MapCircle;
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapView;
-import net.daum.mf.map.api.MapReverseGeoCoder;
 
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -102,20 +87,14 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
 
     MapPOIItem searchMarker = new MapPOIItem();
 
-/*    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        bus.register(this);
-
-        return inflater.inflate(R.layout.activity_map, container, false);
-
-    }*/
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
        View view = inflater.inflate(R.layout.activity_map, container, false);
-       if(isTrackingMode)
-            bus.register(this); //정류소 등록
+
+
+        bus.register(this); //정류소 등록
         mSearchEdit = view.findViewById(R.id.map_et_search);
         fab_open = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_open);
         fab_close = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_close);
@@ -135,75 +114,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
     }
 
 
-  /*  @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map);
-        Intent intent = new Intent(this, SplashActivity.class);
-        startActivity(intent);
-        bus.register(this); //정류소 등록
-        if (!checkLocationServicesStatus()) {
-            showDialogForLocationServiceSetting();
-        }else {
-            checkRunTimePermission();
-        }
-    }*/
-    /*
-     * ActivityCompat.requestPermissions를 사용한 퍼미션 요청의 결과를 리턴받는 메소드입니다.
-     */
-
-
     private void initView() {
-        //binding
-/*        mSearchEdit = getView().findViewById(R.id.map_et_search);
-        fab_open = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_open);
-        fab_close = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_close);
-        fab = getView().findViewById(R.id.fab);
-        fab1 = getView().findViewById(R.id.fab1);
-        fab2 = getView().findViewById(R.id.fab2);
-        fab3 = getView().findViewById(R.id.fab3);
-        searchDetailFab = getView().findViewById(R.id.fab_detail);
-        stopTrackingFab = mMapView.findViewById(R.id.fab_stop_tracking);
-        mLoaderLayout = mMapView.findViewById(R.id.loaderLayout);
-        mMapView = new MapView(getActivity());
-        mMapViewContainer = mMapView.findViewById(R.id.map_mv_mapcontainer);
-        mMapViewContainer.addView(mMapView);
-        recyclerView = mMapView.findViewById(R.id.map_recyclerview);
-        LocationAdapter locationAdapter = new LocationAdapter(documentArrayList, getActivity(), mSearchEdit, recyclerView);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false); //레이아웃매니저 생성
-        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL)); //아래구분선 세팅
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(locationAdapter);*/
-
-        //네비게이션
-/*        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.main_bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Intent intent;
-                finish();
-                switch (item.getItemId()) {
-                    case R.id.bottom_nav_1:
-                        intent = new Intent(getApplicationContext(),  MapActivity.class);
-                        startActivity(intent);
-                        break;
-                    case R.id.bottom_nav_2:
-                        intent = new Intent(getApplicationContext(), AddFriendActivity.class);
-                        startActivity(intent);
-                        break;
-                    case R.id.bottom_nav_3:
-                        intent = new Intent(getApplicationContext(), ProxyDriverActivity.class);
-                        startActivity(intent);
-                        break;
-                    case R.id.bottom_nav_4:
-                        intent = new Intent(getApplicationContext(), recordingActivity.class);
-                        startActivity(intent);
-                        break;
-                }
-                return true;
-            }
-        });*/
-
 
         LocationAdapter locationAdapter = new LocationAdapter(documentArrayList, getActivity(), mSearchEdit, recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false); //레이아웃매니저 생성
@@ -301,6 +212,8 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
             }
         });
     }
+
+
 
     @Override
     public void onClick(View v) {
@@ -870,9 +783,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
         Log.d(TAG, "현재위치 => " + mCurrentLat + "  " + mCurrentLng);
         mLoaderLayout.setVisibility(View.GONE);
         //트래킹 모드가 아닌 단순 현재위치 업데이트일 경우, 한번만 위치 업데이트하고 트래킹을 중단시키기 위한 로직
-        if (!isTrackingMode) {
-            mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
-        }
+        mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
     }
 
     @Override
@@ -912,6 +823,15 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
     }
 
 
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+        bus.unregister(this);
+        if (isTrackingMode) {
+            mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
+            mMapView.setShowCurrentLocationMarker(false);
+        }
+    }
 /*    @Override
     public void finish() {
         getActivity().finish();
