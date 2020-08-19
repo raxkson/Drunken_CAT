@@ -29,13 +29,17 @@ import 	androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class recordingActivity extends AppCompatActivity{
-
+    private BackButtonClick BackButtonClick;
     MediaRecorder record;
     String filename="";
     MediaPlayer player;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording);
+
+        // 뒤로가기 2번 종료
+        BackButtonClick = new BackButtonClick(this);
+
 
         File file = new File(getApplicationContext().getFilesDir(),"record.mp4");
         filename = file.getAbsolutePath();
@@ -161,5 +165,9 @@ public class recordingActivity extends AppCompatActivity{
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
 
+    }
+
+    public void onBackPressed(){
+        BackButtonClick.onBackPressed();
     }
 }

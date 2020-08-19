@@ -36,7 +36,7 @@ public class CipherFunc {
         random.nextBytes(bytes);
         byte[] saltBytes = bytes;
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        PBEKeySpec spec = new PBEKeySpec(key.toCharArray(), saltBytes, 70000, 256);
+        PBEKeySpec spec = new PBEKeySpec(key.toCharArray(), saltBytes, 10000, 128);
 
         SecretKey secretKey = factory.generateSecret(spec);
         SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
@@ -67,7 +67,7 @@ public class CipherFunc {
         byte[] encryoptedTextBytes = new byte[buffer.capacity() - saltBytes.length - ivBytes.length];
         buffer.get(encryoptedTextBytes);
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-        PBEKeySpec spec = new PBEKeySpec(key.toCharArray(), saltBytes, 70000, 256);
+        PBEKeySpec spec = new PBEKeySpec(key.toCharArray(), saltBytes, 10000, 128);
         SecretKey secretKey = factory.generateSecret(spec);
         SecretKeySpec secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
         cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes));

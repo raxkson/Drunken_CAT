@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class ProxyDriverActivity extends AppCompatActivity {
+    private BackButtonClick BackButtonClick;
 
     ImageButton btn_kakao;
     Button btn_proxy1,btn_proxy2,btn_proxy3,btn_proxy4,btn_proxy5,btn_proxy6,btn_proxy7,btn_proxy8,btn_proxy9,btn_proxy10;
@@ -23,6 +24,11 @@ public class ProxyDriverActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_proxydriver);
+
+        // 뒤로가기 2번 종료
+        BackButtonClick = new BackButtonClick(this);
+
+        // 대리운전 버튼
         btn_kakao = findViewById(R.id.btn_kakao);
         btn_proxy1 = findViewById(R.id.btn_proxy1);
         btn_proxy2 = findViewById(R.id.btn_proxy2);
@@ -154,5 +160,9 @@ public class ProxyDriverActivity extends AppCompatActivity {
 
 
 
+    }
+
+    public void onBackPressed(){
+        BackButtonClick.onBackPressed();
     }
 }

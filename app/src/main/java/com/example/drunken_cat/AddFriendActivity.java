@@ -39,7 +39,7 @@ import net.daum.mf.map.api.MapView;
 
 public class AddFriendActivity extends AppCompatActivity {
 
-    private ImageButton btn_back;
+    private BackButtonClick BackButtonClick;
     private String key = "DrunkenCAT";
     EditText friend_name_1, friend_phone_1,
             friend_name_2, friend_phone_2,
@@ -58,6 +58,11 @@ public class AddFriendActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_addfriend);
         final File file = new File(getApplicationContext().getFilesDir(),"Friend.txt");
+
+
+        // 뒤로가기 2번 종료
+        BackButtonClick = new BackButtonClick(this);
+
         /* 귀가천사 변수 선언 및 init */
 
         friend_name_1 = findViewById(R.id.friend_name_1);
@@ -175,5 +180,9 @@ public class AddFriendActivity extends AppCompatActivity {
 
         //불러오기 버튼
 
+    }
+
+    public void onBackPressed(){
+        BackButtonClick.onBackPressed();
     }
 }
