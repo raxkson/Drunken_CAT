@@ -28,7 +28,8 @@ public class MainActivity extends AppCompatActivity {
     //location permission
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
-    String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION};
+    private static final int SEND_SMS = 1001;
+    String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS};
 
     private FragmentManager fragmentManager = getSupportFragmentManager();
     private MapActivity fragmentMap = new MapActivity();
@@ -105,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-
             if ( !check_result ) {
                 // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다.2 가지 경우가 있습니다.
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])) {
@@ -113,28 +113,31 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                 }else {
                     Toast.makeText(this, "퍼미션이 거부되었습니다. 설정(앱 정보)에서 퍼미션을 허용해야 합니다. ", Toast.LENGTH_LONG).show();
+                    finish();
                 }
             }
-
         }
     }
 
     void checkRunTimePermission(){
         //런타임 퍼미션 처리
         // 1. 위치 퍼미션을 가지고 있는지 체크합니다.
+        int hasFineSmsPermission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.SEND_SMS);
+
         int hasFineLocationPermission = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
 
-        if (hasFineLocationPermission != PackageManager.PERMISSION_GRANTED ) {
+        if ((hasFineLocationPermission | hasFineSmsPermission) != PackageManager.PERMISSION_GRANTED ) {
 
             // 3-1. 사용자가 퍼미션 거부를 한 적이 있는 경우에는
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])) {
                 Toast.makeText(this, "이 앱을 실행하려면 위치 접근 권한이 필요합니다.", Toast.LENGTH_LONG).show();
+            } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[1])) {
+                Toast.makeText(this,"메시지 권한이 필요합니다.",Toast.LENGTH_LONG).show();
             }
-            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS,
-                    PERMISSIONS_REQUEST_CODE);
+            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
         }
-
     }
 
 
