@@ -20,7 +20,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class ProxyDriverActivity extends Fragment {
 
 
-    private Button btn_kakao,btn_proxy1,btn_proxy2,btn_proxy3,btn_proxy4,btn_proxy5,btn_proxy6,btn_proxy7,btn_proxy8,btn_proxy9,btn_proxy10;
+    ImageButton btn_kakao;
+    Button btn_proxy1,btn_proxy2,btn_proxy3,btn_proxy4,btn_proxy5,btn_proxy6,btn_proxy7,btn_proxy8,btn_proxy9,btn_proxy10;
+
+   
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_proxydriver, container, false);
