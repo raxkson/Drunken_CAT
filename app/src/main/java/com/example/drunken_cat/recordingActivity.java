@@ -51,13 +51,13 @@ public class recordingActivity extends Fragment {
         // start
         view.findViewById(R.id.record_start).setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
-                getActivity().startService(new Intent(getActivity(), VoiceBackgroundActivity.class));//추가
+               // getActivity().startService(new Intent(getActivity(), VoiceBackgroundActivity.class));//추가
             }
         });
         // stop
         view.findViewById(R.id.record_stop).setOnClickListener(new View.OnClickListener(){
             public void onClick(View view){
-                getActivity().stopService(new Intent(getActivity(), VoiceBackgroundActivity.class));// 추가
+               // getActivity().stopService(new Intent(getActivity(), VoiceBackgroundActivity.class));// 추가
                 //stopRecord();
             }
         });

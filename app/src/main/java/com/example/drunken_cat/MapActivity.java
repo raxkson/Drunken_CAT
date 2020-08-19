@@ -22,8 +22,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -352,6 +354,22 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
             String path = storage.getInternalFilesDirectory();
             String Filepath = path + "Location.txt";
 
+            //switch on/off
+            Switch sw =view.findViewById(R.id.swRecord);
+            sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if(isChecked) {
+                        //on
+                        // voice record start
+                        getActivity().startService(new Intent(getActivity(), VoiceBackgroundActivity.class));//추가
+                    }
+                    else{
+                        //
+                        Toast.makeText(getContext(),"Voice Record OFF...",Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
 
             final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
             boolean GPSEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -439,6 +457,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                         SmsManager smsManager = SmsManager.getDefault();
                         for(int i = 1; i < 6; i+=2){
                             smsManager.sendTextMessage(text[i], null, "다들 맛있는거 내가 다 쏜다!", null, null);
+                            getActivity().stopService(new Intent(getActivity(), VoiceBackgroundActivity.class));// 추가
                         }
                         Toast.makeText(getContext(), "SMS Send Success", Toast.LENGTH_SHORT).show();
                     } catch(Exception e){
