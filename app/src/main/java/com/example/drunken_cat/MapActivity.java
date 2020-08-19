@@ -1,12 +1,19 @@
 package com.example.drunken_cat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -18,6 +25,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -34,6 +43,7 @@ import com.example.drunken_cat.utils.BusProvider;
 import com.example.drunken_cat.utils.IntentKey;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.shashank.sony.fancytoastlib.FancyToast;
+import com.snatik.storage.Storage;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -43,15 +53,10 @@ import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapView;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -64,6 +69,8 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 public class MapActivity extends Fragment implements  MapView.MapViewEventListener, MapView.POIItemEventListener, MapView.OpenAPIKeyAuthenticationResultListener, View.OnClickListener, MapView.CurrentLocationEventListener {
     final static String TAG = "MapTAG";
 
+        //storage.setEncryptConfiguration(configuration);
+
 
     //xml
     MapView mMapView;
@@ -71,7 +78,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
     EditText mSearchEdit;
     private Animation fab_open, fab_close;
     private Boolean isFabOpen = false;
-    private FloatingActionButton fab, fab1, fab2, fab3, searchDetailFab, stopTrackingFab;
+    private FloatingActionButton fab, fab1, fab2, fab3, searchDetailFab, stopTrackingFab, goHome;
     RelativeLayout mLoaderLayout;
     RecyclerView recyclerView;
 
@@ -101,6 +108,16 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
 
     private InputMethodManager imm;
     private View view;
+
+    Thread thread;
+    boolean isThread = false;
+    double cur_longitude = 1000;
+    double cur_latitude = 1000;
+    double dst_longitude = 126.644383;
+    double dst_latitude = 37.386208;
+    double bef_distance = 100000000;
+    double cur_distance = 0;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
        view = inflater.inflate(R.layout.activity_map, container, false);
@@ -114,6 +131,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
         fab1 = view.findViewById(R.id.fab1);
         fab2 = view.findViewById(R.id.fab2);
         fab3 = view.findViewById(R.id.fab3);
+        goHome = view.findViewById(R.id.gohome);
         searchDetailFab = view.findViewById(R.id.fab_detail);
         stopTrackingFab = view.findViewById(R.id.fab_stop_tracking);
         mLoaderLayout = view.findViewById(R.id.loaderLayout);
@@ -144,6 +162,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
         fab1.setOnClickListener(this);
         fab2.setOnClickListener(this);
         fab3.setOnClickListener(this);
+        goHome.setOnClickListener(this);
         searchDetailFab.setOnClickListener(this);
         stopTrackingFab.setOnClickListener(this);
 
@@ -274,6 +293,32 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                 }
                 mLoaderLayout.setVisibility(View.GONE);
                 break;
+            case R.id.gohome:
+
+                Storage storage = new Storage(getContext());
+                String path = storage.getInternalFilesDirectory();
+                String Filepath = path + "Destination.txt";
+
+                String[] arr = storage.readTextFile(Filepath).split(" ");
+                dst_latitude = Double.parseDouble(arr[0]);
+                dst_longitude = Double.parseDouble(arr[1]);
+                System.out.println("hello" + arr[0] + ", " + arr[1]);
+
+                isThread = true;
+                thread =  new Thread(){
+                    public void run(){
+                        while(isThread){
+                            try {
+                                sleep(5000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            handler.sendEmptyMessage(0);
+                        }
+                    }
+                };
+                thread.start();
+                break;
             case R.id.fab_detail:
                 FancyToast.makeText(getActivity(), "검색결과 상세보기", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
                 Intent detailIntent = new Intent(getActivity(), MapSearchDetailActivity.class);
@@ -297,6 +342,159 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                 FancyToast.makeText(getActivity(), "현재위치 추적 종료", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
                 break;
         }
+    }
+
+
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            Storage storage = new Storage(getContext());
+            String path = storage.getInternalFilesDirectory();
+            String Filepath = path + "Location.txt";
+
+
+            final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            boolean GPSEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            boolean NetworkEnabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            boolean PassiveEnabled = lm.isProviderEnabled(LocationManager.PASSIVE_PROVIDER);
+            long now =  System.currentTimeMillis();
+            Date date = new Date(now);
+            SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            String formatDate = sdfNow.format(date);
+
+
+                Location location = null;
+
+                if(GPSEnabled){
+                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                            0,
+                            0,
+                            mLocationListener);
+                    if(lm != null){
+                        location = lm.getLastKnownLocation(lm.GPS_PROVIDER);
+                        if(location != null){
+                            cur_longitude = location.getLongitude();
+                            cur_latitude = location.getLatitude();
+                        }
+                    }
+                }
+
+                if(NetworkEnabled){
+                    if(location == null){
+                        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                                0,
+                                0,
+                                mLocationListener);
+                        if(lm != null) {
+                            location = lm.getLastKnownLocation(lm.NETWORK_PROVIDER);
+                            if (location != null) {
+                                cur_longitude = location.getLongitude();
+                                cur_latitude = location.getLatitude();
+                            }
+                        }
+                    }
+                }
+
+                if(PassiveEnabled){
+                    if(location == null){
+                        lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER,
+                                0,
+                                0,
+                                mLocationListener);
+                        if(lm != null) {
+                            location = lm.getLastKnownLocation(lm.PASSIVE_PROVIDER);
+                            if (location != null) {
+                                cur_longitude = location.getLongitude();
+                                cur_latitude = location.getLatitude();
+                            }
+                        }
+                    }
+                }
+
+
+                boolean fileExists = storage.isFileExist(Filepath);
+                if(fileExists)
+                    storage.appendFile(Filepath, Double.toString(cur_longitude)+" "+Double.toString(cur_latitude)+" "+formatDate+"\n");
+                else
+                    storage.createFile(Filepath, Double.toString(cur_longitude)+" "+Double.toString(cur_latitude)+" "+formatDate+"\n");
+
+                cur_distance = distanceInKilometerByHaversine(dst_latitude, dst_longitude, cur_latitude, cur_longitude);
+                Toast.makeText(getContext(), Double.toString(cur_distance), Toast.LENGTH_SHORT).show();
+                if(cur_distance < 1){//목적지 도착
+                    Toast.makeText(getContext(), "목적지 도착", Toast.LENGTH_SHORT).show();
+                    isThread = false;
+
+                }
+                if(cur_distance > bef_distance + 0.005){//SOS
+                    Toast.makeText(getContext(), "경로이탈", Toast.LENGTH_SHORT).show();
+
+                    Filepath = path + "Friend.txt";
+
+                    String content = storage.readTextFile(Filepath);
+                    //name1☎phone1☎name2☎phone2☎name3☎phone3
+                    String[] text = content.split("☎");
+
+
+                    try{
+                        SmsManager smsManager = SmsManager.getDefault();
+                        for(int i = 1; i < 6; i+=2){
+                            smsManager.sendTextMessage(text[i], null, "다들 맛있는거 내가 다 쏜다!", null, null);
+                        }
+                        Toast.makeText(getContext(), "SMS Send Success", Toast.LENGTH_SHORT).show();
+                    } catch(Exception e){
+                        Toast.makeText(getContext(), "SMS Send failed", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+
+                }
+                bef_distance = cur_distance;
+                lm.removeUpdates(mLocationListener);
+
+            }
+
+    };
+
+    private final LocationListener mLocationListener =  new LocationListener() {
+        @Override
+        public void onLocationChanged(@NonNull Location location) {
+            cur_longitude = location.getLongitude();//height
+            cur_latitude = location.getLatitude();//width
+
+            double altitude = location.getAltitude();
+            float accuracy = location.getAccuracy();
+            String provider = location.getProvider();
+        }
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+
+        }
+    };
+
+    public static double distanceInKilometerByHaversine(double x1, double y1, double x2, double y2) {
+        double distance;
+        double radius = 6371;
+        double toRadian = Math.PI / 180;
+
+        double deltaLatitude = Math.abs(x1 - x2) * toRadian;
+        double deltaLongitude = Math.abs(y1 - y2) * toRadian;
+
+        double sinDeltaLat = Math.sin(deltaLatitude / 2);
+        double sinDeltaLng = Math.sin(deltaLongitude / 2);
+        double squareRoot = Math.sqrt(
+                sinDeltaLat * sinDeltaLat +
+                        Math.cos(x1 * toRadian) * Math.cos(x2 * toRadian) * sinDeltaLng * sinDeltaLng);
+        distance = 2 * radius * Math.asin(squareRoot);
+        return distance;
     }
 
     private void requestSearchLocal(double x, double y) {
@@ -621,17 +819,21 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
             fab1.startAnimation(fab_close);
             fab2.startAnimation(fab_close);
             fab3.startAnimation(fab_close);
+            goHome.startAnimation(fab_close);
             fab1.setClickable(false);
             fab2.setClickable(false);
             fab3.setClickable(false);
+            goHome.setClickable(false);
             isFabOpen = false;
         } else {
             fab1.startAnimation(fab_open);
             fab2.startAnimation(fab_open);
             fab3.startAnimation(fab_open);
+            goHome.startAnimation(fab_open);
             fab1.setClickable(true);
             fab2.setClickable(true);
             fab3.setClickable(true);
+            goHome.setClickable(true);
             isFabOpen = true;
         }
     }
@@ -753,23 +955,18 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                     FancyToast.makeText(getActivity(), "목적지가 등록되었습니다.", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
                     mLoaderLayout.setVisibility(View.GONE);
                     dialogInterface.dismiss();
-                    final File file = new File(getActivity().getFilesDir(), "Destination.txt");
-                    try {
-                        String dest = lat + ", " + lng;
-                        FileWriter fw = new FileWriter(file ,true);
-                        BufferedWriter buff = new BufferedWriter(fw);
-                        if (file.exists())
-                            file.delete();
-                        buff.write(dest);
-                        try {
-                            buff.close();
-                            fw.close();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+
+                    //create destination file
+
+                    Storage storage = new Storage(getContext());
+                    String path = storage.getInternalFilesDirectory();
+                    String Filepath = path + "Destination.txt";
+                    String dest = lat + " " + lng;
+                    boolean fileExists = storage.isFileExist(Filepath);
+                    if(fileExists){
+                        storage.deleteFile(Filepath);
                     }
+                    storage.createFile(Filepath, dest);
                 }
             }
         });
