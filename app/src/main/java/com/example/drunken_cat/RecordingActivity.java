@@ -108,7 +108,7 @@ public class RecordingActivity extends Fragment
     }
 
     public void  playSong() {
-        //media.reset();
+
         if(media.getCurrentPosition() == 0){
             media.reset();
             try {
@@ -159,7 +159,7 @@ public class RecordingActivity extends Fragment
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
-        // remove message Handler from updating progress bar
+
         mHandler.removeCallbacks(mUpdateTimeTask);
     }
 
@@ -169,10 +169,10 @@ public class RecordingActivity extends Fragment
         int totalDuration = media.getDuration();
         int currentPosition = utils.progressToTimer(seekBar.getProgress(), totalDuration);
 
-        // forward or backward to certain seconds
+
         media.seekTo(currentPosition);
 
-        // update timer progress again
+
         updateProgressBar();
     }
 

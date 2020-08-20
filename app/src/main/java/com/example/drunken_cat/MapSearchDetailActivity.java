@@ -22,21 +22,21 @@ import java.util.ArrayList;
 public class MapSearchDetailActivity extends AppCompatActivity {
     final static String TAG = "MapSearchDetailTAG";
 
-    //xml
+
     RadarChart radarChart;
     TextView itemCntText1, itemCntText2, itemCntText3, itemCntText4, itemCntText5, itemCntText6, itemCntText7, itemCntText8, itemCntText9, ratingScore;
     RatingBar ratingBar;
 
-    //value
-    ArrayList<Document> bigMartList = new ArrayList<>(); //대형마트 MT1
-    ArrayList<Document> gs24List = new ArrayList<>(); //편의점 CS2
-    ArrayList<Document> schoolList = new ArrayList<>(); //학교 SC4
-    ArrayList<Document> academyList = new ArrayList<>(); //학원 AC5
-    ArrayList<Document> subwayList = new ArrayList<>(); //지하철 SW8
-    ArrayList<Document> bankList = new ArrayList<>(); //은행 BK9
-    ArrayList<Document> hospitalList = new ArrayList<>(); //병원 HP8
-    ArrayList<Document> pharmacyList = new ArrayList<>(); //약국 PM9
-    ArrayList<Document> cafeList = new ArrayList<>(); //카페
+
+    ArrayList<Document> bigMartList = new ArrayList<>();
+    ArrayList<Document> gs24List = new ArrayList<>();
+    ArrayList<Document> schoolList = new ArrayList<>();
+    ArrayList<Document> academyList = new ArrayList<>();
+    ArrayList<Document> subwayList = new ArrayList<>();
+    ArrayList<Document> bankList = new ArrayList<>();
+    ArrayList<Document> hospitalList = new ArrayList<>();
+    ArrayList<Document> pharmacyList = new ArrayList<>();
+    ArrayList<Document> cafeList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +59,7 @@ public class MapSearchDetailActivity extends AppCompatActivity {
         initView();
     }
 
-    //인텐트처리
+
     private void processIntent() {
         Intent getIntent = getIntent();
         bigMartList = getIntent.getParcelableArrayListExtra(IntentKey.CATEGOTY_SEARCH_MODEL_EXTRA1);
@@ -94,7 +94,7 @@ public class MapSearchDetailActivity extends AppCompatActivity {
         itemCntText9.setText("" +(int) itemCnt9);
 
 
-        //평균계산 최대 10점
+
         if(itemCnt1 > 10){
             itemCnt1 = 10;
         }
@@ -127,7 +127,7 @@ public class MapSearchDetailActivity extends AppCompatActivity {
         ratingBar.setRating((float) (averageScore/2));
     }
 
-    //차트생성
+
     private void makeChart() {
         RadarDataSet dataSet = new RadarDataSet(dataValue(), "주변환경");
         dataSet.setColor(Color.BLUE);
@@ -140,7 +140,7 @@ public class MapSearchDetailActivity extends AppCompatActivity {
         radarChart.setData(data);
     }
 
-    //차트 데이터 생성
+
     private ArrayList<RadarEntry> dataValue() {
         ArrayList<RadarEntry> dataVals = new ArrayList<>();
         dataVals.add(new RadarEntry(bigMartList.size()));

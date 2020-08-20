@@ -82,18 +82,15 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 public class MapActivity extends Fragment implements MapView.MapViewEventListener, MapView.POIItemEventListener, MapView.OpenAPIKeyAuthenticationResultListener, View.OnClickListener, MapView.CurrentLocationEventListener {
     final static String TAG = "MapTAG";
 
-    //storage.setEncryptConfiguration(configuration);
 
-    //Notification
-    //Notification
     public static final String NOTIFICATION_CHANNEL_ID = "11111";
     private int count;
 
-    //xml
+
     public String locationString = "";
-    String IVX = "abcdefghijklmnop"; // 16 lenght - not secret
+    String IVX = "abcdefghijklmnop";
     String SECRET_KEY;
-    byte[] SALT = "0000111100001111".getBytes(); // random 16 bytes array
+    byte[] SALT = "0000111100001111".getBytes();
     EncryptConfiguration configuration;
     MapView mMapView;
     ViewGroup mMapViewContainer;
@@ -103,35 +100,34 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     private FloatingActionButton fab, fab1, fab2, fab3, searchDetailFab, stopTrackingFab, goHome, stopGoHomeFab, overlayFab, eraseMarker;
     RelativeLayout mLoaderLayout;
     RecyclerView recyclerView;
-    //value
+
     MapPoint currentMapPoint;
-    private double mCurrentLng; //Long = X, Lat = Yㅌ
+    private double mCurrentLng;
     private double mCurrentLat;
     private double mSearchLng = -1;
     private double mSearchLat = -1;
     private String mSearchName;
-    boolean isTrackingMode; //트래킹 모드인지 (3번째 버튼 현재위치 추적 눌렀을 경우 true되고 stop 버튼 누르면 false로 된다)
+    boolean isTrackingMode;
     Bus bus = BusProvider.getInstance();
 
-    ArrayList<Document> bigMartList = new ArrayList<>(); //대형마트 MT1
-    ArrayList<Document> gs24List = new ArrayList<>(); //편의점 CS2
-    ArrayList<Document> schoolList = new ArrayList<>(); //학교 SC4
-    ArrayList<Document> academyList = new ArrayList<>(); //학원 AC5
-    ArrayList<Document> subwayList = new ArrayList<>(); //지하철 SW8
-    ArrayList<Document> bankList = new ArrayList<>(); //은행 BK9
-    ArrayList<Document> hospitalList = new ArrayList<>(); //병원 HP8
-    ArrayList<Document> pharmacyList = new ArrayList<>(); //약국 PM9
-    ArrayList<Document> cafeList = new ArrayList<>(); //카페
+    ArrayList<Document> bigMartList = new ArrayList<>();
+    ArrayList<Document> gs24List = new ArrayList<>();
+    ArrayList<Document> schoolList = new ArrayList<>();
+    ArrayList<Document> academyList = new ArrayList<>();
+    ArrayList<Document> subwayList = new ArrayList<>();
+    ArrayList<Document> bankList = new ArrayList<>();
+    ArrayList<Document> hospitalList = new ArrayList<>();
+    ArrayList<Document> pharmacyList = new ArrayList<>();
+    ArrayList<Document> cafeList = new ArrayList<>();
 
-    ArrayList<Document> documentArrayList = new ArrayList<>(); //지역명 검색 결과 리스트
+    ArrayList<Document> documentArrayList = new ArrayList<>();
 
     MapPOIItem searchMarker = new MapPOIItem();
 
     private InputMethodManager imm;
     private View view;
 
-    //Thread thread;
-    //private boolean isThread;
+
     private Handler mmHandler = new Handler();
     double bef_longitude = 2000;
     double bef_latitude = 2000;
@@ -170,10 +166,10 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 .build();
         view = inflater.inflate(R.layout.activity_map, container, false);
         if(this.getArguments() != null){
-            record_switch = this.getArguments().getBoolean("recordSwitch"); // 전달한 key 값
+            record_switch = this.getArguments().getBoolean("recordSwitch");
         }
 
-        bus.register(this); //정류소 등록
+        bus.register(this);
         mSearchEdit = view.findViewById(R.id.map_et_search);
         fab_open = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_open);
         fab_close = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_close);
@@ -201,17 +197,17 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     private void initView() {
 
         LocationAdapter locationAdapter = new LocationAdapter(documentArrayList, mSearchEdit, recyclerView);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false); //레이아웃매니저 생성
-        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL)); //아래구분선 세팅
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(locationAdapter);
 
-        //맵 리스너
-        mMapView.setMapViewEventListener(this); // this에 MapView.MapViewEventListener 구현.
+
+        mMapView.setMapViewEventListener(this);
         mMapView.setPOIItemEventListener(this);
         mMapView.setOpenAPIKeyAuthenticationResultListener(this);
 
-        //버튼리스너
+
         fab.setOnClickListener(this);
         fab1.setOnClickListener(this);
         fab2.setOnClickListener(this);
@@ -223,27 +219,27 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
         stopGoHomeFab.setOnClickListener(this);
         eraseMarker.setOnClickListener(this);
 
-        //맵 리스너 (현재위치 업데이트)
+
         mMapView.setCurrentLocationEventListener(this);
-        //setCurrentLocationTrackingMode (지도랑 현재위치 좌표 찍어주고 따라다닌다.)
+
         if (ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
 
         mLoaderLayout.setVisibility(View.VISIBLE);
 
-        // editText 검색 텍스처이벤트
+
         mSearchEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-                // 입력하기 전에
+
                 recyclerView.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
                 if (charSequence.length() >= 1) {
-                    // if (SystemClock.elapsedRealtime() - mLastClickTime < 500) {
+
 
                     documentArrayList.clear();
                     locationAdapter.clear();
@@ -267,8 +263,8 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
 
                         }
                     });
-                    //}
-                    //mLastClickTime = SystemClock.elapsedRealtime();
+
+
                 } else {
                     if (charSequence.length() <= 0) {
                         recyclerView.setVisibility(View.GONE);
@@ -278,7 +274,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
 
             @Override
             public void afterTextChanged(Editable editable) {
-                // 입력이 끝났을 때
+
             }
         });
 
@@ -308,7 +304,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     public void onClick(View v) {
 
         if(this.getArguments() != null){
-            record_switch = this.getArguments().getBoolean("recordSwitch"); // 전달한 key 값
+            record_switch = this.getArguments().getBoolean("recordSwitch");
         }
         int id = v.getId();
         switch (id) {
@@ -318,7 +314,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                         "\n3번 버튼: 현재위치 추적 및 업데이트", FancyToast.LENGTH_SHORT, FancyToast.INFO, true).show();
                 anim();
                 break;
-            case R.id.fab1: //아래버튼에서부터 1~3임
+            case R.id.fab1:
                 FancyToast.makeText(getActivity(), "현재위치 추적 시작", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
                 searchDetailFab.setVisibility(View.GONE);
                 mLoaderLayout.setVisibility(View.VISIBLE);
@@ -335,7 +331,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 eraseMarker.setVisibility(View.VISIBLE);
                 mLoaderLayout.setVisibility(View.VISIBLE);
                 anim();
-                //현재 위치 기준으로 1km 검색
+
                 mMapView.removeAllPOIItems();
                 mMapView.removeAllCircles();
                 requestSearchLocal(mCurrentLng, mCurrentLat);
@@ -371,8 +367,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                     String[] arr = storage.readTextFile(Filepath).split(" ");
                     dst_latitude = Double.parseDouble(arr[0]);
                     dst_longitude = Double.parseDouble(arr[1]);
-                    //isThread = true;
-                    //switch on off
+
                     searchDetailFab.setVisibility(View.GONE);
                     mLoaderLayout.setVisibility(View.VISIBLE);
                     FancyToast.makeText(getActivity(), arr[2] + "로 안전 귀가 서비스가 정상 작동합니다.", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
@@ -405,27 +400,27 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                         String[] txt = text[i].split("★");
                         double latitude = Double.parseDouble(txt[0]);
                         double longitude = Double.parseDouble(txt[1]);
-                        //카카오맵은 참고로 new MapPoint()로  생성못함. 좌표기준이 여러개라 이렇게 메소드로 생성해야함
+
                         MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(latitude, longitude);
                         MapPOIItem marker = new MapPOIItem();
                         marker.setItemName(txt[2]);
                         marker.setTag(0);
                         marker.setMapPoint(mapPoint);
-                        marker.setMarkerType(MapPOIItem.MarkerType.BluePin); // 기본으로 제공하는 BluePin 마커 모양.
-                        marker.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+                        marker.setMarkerType(MapPOIItem.MarkerType.BluePin);
+                        marker.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
                         mMapView.addPOIItem(marker);
                         polyline.setTag(1000);
-                        polyline.setLineColor(Color.argb(128, 255, 51, 0)); // Polyline 컬러 지정.
-// Polyline 좌표 지정.
+                        polyline.setLineColor(Color.argb(128, 255, 51, 0));
+
                         polyline.addPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude));
-// Polyline 지도에 올리기.
+
 
                     }
                     mMapView.addPolyline(polyline);
 
-// 지도뷰의 중심좌표와 줌레벨을 Polyline이 모두 나오도록 조정.
+
                     MapPointBounds mapPointBounds = new MapPointBounds(polyline.getMapPoints());
-                    int padding = 100; // px
+                    int padding = 100;
                     mMapView.moveCamera(CameraUpdateFactory.newMapPointBounds(mapPointBounds, padding));
                 }
 
@@ -442,7 +437,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 detailIntent.putParcelableArrayListExtra(IntentKey.CATEGOTY_SEARCH_MODEL_EXTRA7, hospitalList);
                 detailIntent.putParcelableArrayListExtra(IntentKey.CATEGOTY_SEARCH_MODEL_EXTRA8, pharmacyList);
                 detailIntent.putParcelableArrayListExtra(IntentKey.CATEGOTY_SEARCH_MODEL_EXTRA9, cafeList);
-                //overridePendingTransition(R.anim.fade_in_splash, R.anim.fade_out_splash);
+
                 startActivity(detailIntent);
                 Log.d(TAG, "fab_detail");
                 break;
@@ -453,7 +448,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 FancyToast.makeText(getActivity(), "현재위치 추적 종료", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
                 break;
             case R.id.fab_stop_goHome:
-                //isThread = false;
+
                 storage = new Storage(getContext());
                 path = storage.getInternalFilesDirectory();
                 Filepath = path + "Location.txt";
@@ -463,7 +458,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 if(!locationString.equals(""))
                     storage.createFile(Filepath, locationString);
                 if(record_switch)
-                    getActivity().stopService(new Intent(getActivity(), VoiceBackgroundActivity.class));// 추가
+                    getActivity().stopService(new Intent(getActivity(), VoiceBackgroundActivity.class));
                 mmHandler.removeCallbacksAndMessages(null);
                 mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
                 stopGoHomeFab.setVisibility(View.GONE);
@@ -552,29 +547,17 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 }
             }
 
-                /*boolean fileExists = storage.isFileExist(Filepath);
-                if(fileExists)
-                    storage.appendFile(Filepath, "★" + cur
 
-
-                    _longitude +"★"+ cur_latitude +"★"+formatDate);
-                else
-                    storage.createFile(Filepath, "★" + cur_longitude +"★"+ cur_latitude +"★"+formatDate);*/
             locationString += cur_latitude + "★" + cur_longitude + "★" + formatDate + "\n";
             System.out.println(locationString);
             cur_distance = distanceInKilometerByHaversine(dst_latitude, dst_longitude, cur_latitude, cur_longitude);
             Toast.makeText(getContext(), Double.toString(cur_distance), Toast.LENGTH_SHORT).show();
 
-            if (cur_distance < 0.5) {//목적지 도착
+            if (cur_distance < 0.5) {
                 NotificationSomethings("목적지에 도착하였습니다");
                 mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
                 stopGoHomeFab.setVisibility(View.GONE);
-                /*fileExists = storage.isFileExist(Filepath);
-                if (fileExists) {
-                    storage.deleteFile(Filepath);
-                }
-                if(!locationString.equals(""))
-                    storage.createFile(Filepath, locationString);*/
+
                 storage = new Storage(getContext());
                 path = storage.getInternalFilesDirectory();
                 Filepath = path + "Location.txt";
@@ -589,15 +572,15 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 lm.removeUpdates(mLocationListener);
             }
 
-            if (cur_distance > bef_distance + 0.5) {//SOS
+            if (cur_distance > bef_distance + 0.5) {
                 NotificationSomethings("경로를 이탈하여 SMS를 전송합니다");
-                //Toast.makeText(getContext(), "경로이탈", Toast.LENGTH_SHORT).show();
+
 
                 Filepath = path + "Friend.txt";
                 fileExists = storage.isFileExist(Filepath);
                 if (fileExists) {
                     String content = storage.readTextFile(Filepath);
-                    //name1☎phone1☎name2☎phone2☎name3☎phone3
+
                     int length = 0;
                     String[] text = content.split("☎");
                     try {
@@ -619,9 +602,9 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
             }
 
             tmp_distance = distanceInKilometerByHaversine(bef_latitude, bef_longitude, cur_latitude, cur_longitude);
-            if (tmp_distance < 0.01 && bef_latitude != 2000 && bef_longitude != 2000) {//SOS
+            if (tmp_distance < 0.01 && bef_latitude != 2000 && bef_longitude != 2000) {
                 NotificationSomethings("움직임이 감지되지 않아 SMS를 전송합니다");
-                //Toast.makeText(getContext(), "움직임 없음", Toast.LENGTH_SHORT).show();
+
 
                 Filepath = path + "Friend.txt";
 
@@ -629,7 +612,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 fileExists = storage.isFileExist(Filepath);
                 if (fileExists) {
                     String content = storage.readTextFile(Filepath);
-                    //name1☎phone1☎name2☎phone2☎name3☎phone3
+
                     int length = 0;
                     String[] text = content.split("☎");
                     try {
@@ -637,7 +620,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                         length = text.length;
                         for (int i = 1; i < length; i += 2) {
                             smsManager.sendTextMessage(text[i], null, "지인의 움직임이 감지되지 않습니다", null, null);
-                            //Toast.makeText(getContext(), text[i], Toast.LENGTH_SHORT).show();
+
                         }
                         Toast.makeText(getContext(), Integer.toString(length / 2) + "명의 지인에게 SMS를 전송하였습니다", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
@@ -660,8 +643,8 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     private final LocationListener mLocationListener =  new LocationListener() {
         @Override
         public void onLocationChanged(@NonNull Location location) {
-            cur_longitude = location.getLongitude();//height
-            cur_latitude = location.getLatitude();//width
+            cur_longitude = location.getLongitude();
+            cur_latitude = location.getLatitude();
 
         }
         @Override
@@ -782,12 +765,12 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                                                                                                                     assert response.body() != null;
                                                                                                                     Log.d(TAG, "cafeList Success");
                                                                                                                     cafeList.addAll(response.body().getDocuments());
-                                                                                                                    //모두 통신 성공 시 circle 생성
+
                                                                                                                     MapCircle circle1 = new MapCircle(
-                                                                                                                            MapPoint.mapPointWithGeoCoord(y, x), // center
-                                                                                                                            1000, // radius
-                                                                                                                            Color.argb(128, 255, 0, 0), // strokeColor
-                                                                                                                            Color.argb(128, 0, 255, 0) // fillColor
+                                                                                                                            MapPoint.mapPointWithGeoCoord(y, x),
+                                                                                                                            1000,
+                                                                                                                            Color.argb(128, 255, 0, 0),
+                                                                                                                            Color.argb(128, 0, 255, 0)
                                                                                                                     );
                                                                                                                     circle1.setTag(5678);
                                                                                                                     mMapView.addCircle(circle1);
@@ -797,7 +780,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                                                                                                                     Log.d("SIZE4", academyList.size() + "");
                                                                                                                     Log.d("SIZE5", subwayList.size() + "");
                                                                                                                     Log.d("SIZE6", bankList.size() + "");
-                                                                                                                    //마커 생성
+
                                                                                                                     int tagNum = 10;
                                                                                                                     for (Document document : bigMartList) {
                                                                                                                         MapPOIItem marker = new MapPOIItem();
@@ -805,13 +788,13 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                                                                                                                         marker.setTag(tagNum++);
                                                                                                                         double x = Double.parseDouble(document.getY());
                                                                                                                         double y = Double.parseDouble(document.getX());
-                                                                                                                        //카카오맵은 참고로 new MapPoint()로  생성못함. 좌표기준이 여러개라 이렇게 메소드로 생성해야함
+
                                                                                                                         MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(x, y);
                                                                                                                         marker.setMapPoint(mapPoint);
-                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
-                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_big_mart_marker); // 마커 이미지.
-                                                                                                                        marker.setCustomImageAutoscale(false); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
-                                                                                                                        marker.setCustomImageAnchor(0.5f, 1.0f); // 마커 이미지중 기준이 되는 위치(앵커포인트) 지정 - 마커 이미지 좌측 상단 기준 x(0.0f ~ 1.0f), y(0.0f ~ 1.0f) 값.
+                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage);
+                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_big_mart_marker);
+                                                                                                                        marker.setCustomImageAutoscale(false);
+                                                                                                                        marker.setCustomImageAnchor(0.5f, 1.0f);
                                                                                                                         mMapView.addPOIItem(marker);
                                                                                                                     }
                                                                                                                     for (Document document : gs24List) {
@@ -820,12 +803,12 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                                                                                                                         marker.setTag(tagNum++);
                                                                                                                         double x = Double.parseDouble(document.getY());
                                                                                                                         double y = Double.parseDouble(document.getX());
-                                                                                                                        //카카오맵은 참고로 new MapPoint()로  생성못함. 좌표기준이 여러개라 이렇게 메소드로 생성해야함
+
                                                                                                                         MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(x, y);
                                                                                                                         marker.setMapPoint(mapPoint);
-                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
-                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_24_mart_marker); // 마커 이미지.
-                                                                                                                        marker.setCustomImageAutoscale(false); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
+                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage);
+                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_24_mart_marker);
+                                                                                                                        marker.setCustomImageAutoscale(false);
                                                                                                                         marker.setCustomImageAnchor(0.5f, 1.0f);
                                                                                                                         mMapView.addPOIItem(marker);
                                                                                                                     }
@@ -835,12 +818,12 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                                                                                                                         marker.setTag(tagNum++);
                                                                                                                         double x = Double.parseDouble(document.getY());
                                                                                                                         double y = Double.parseDouble(document.getX());
-                                                                                                                        //카카오맵은 참고로 new MapPoint()로  생성못함. 좌표기준이 여러개라 이렇게 메소드로 생성해야함
+
                                                                                                                         MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(x, y);
                                                                                                                         marker.setMapPoint(mapPoint);
-                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
-                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_school_marker); // 마커 이미지.
-                                                                                                                        marker.setCustomImageAutoscale(false); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
+                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage);
+                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_school_marker);
+                                                                                                                        marker.setCustomImageAutoscale(false);
                                                                                                                         marker.setCustomImageAnchor(0.5f, 1.0f);
                                                                                                                         mMapView.addPOIItem(marker);
                                                                                                                     }
@@ -850,12 +833,12 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                                                                                                                         marker.setTag(tagNum++);
                                                                                                                         double x = Double.parseDouble(document.getY());
                                                                                                                         double y = Double.parseDouble(document.getX());
-                                                                                                                        //카카오맵은 참고로 new MapPoint()로  생성못함. 좌표기준이 여러개라 이렇게 메소드로 생성해야함
+
                                                                                                                         MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(x, y);
                                                                                                                         marker.setMapPoint(mapPoint);
-                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
-                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_academy_marker); // 마커 이미지.
-                                                                                                                        marker.setCustomImageAutoscale(false); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
+                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage);
+                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_academy_marker);
+                                                                                                                        marker.setCustomImageAutoscale(false);
                                                                                                                         marker.setCustomImageAnchor(0.5f, 1.0f);
                                                                                                                         mMapView.addPOIItem(marker);
                                                                                                                     }
@@ -865,12 +848,12 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                                                                                                                         marker.setTag(tagNum++);
                                                                                                                         double x = Double.parseDouble(document.getY());
                                                                                                                         double y = Double.parseDouble(document.getX());
-                                                                                                                        //카카오맵은 참고로 new MapPoint()로  생성못함. 좌표기준이 여러개라 이렇게 메소드로 생성해야함
+
                                                                                                                         MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(x, y);
                                                                                                                         marker.setMapPoint(mapPoint);
-                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
-                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_subway_marker); // 마커 이미지.
-                                                                                                                        marker.setCustomImageAutoscale(false); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
+                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage);
+                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_subway_marker);
+                                                                                                                        marker.setCustomImageAutoscale(false);
                                                                                                                         marker.setCustomImageAnchor(0.5f, 1.0f);
                                                                                                                         mMapView.addPOIItem(marker);
                                                                                                                     }
@@ -880,12 +863,12 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                                                                                                                         marker.setTag(tagNum++);
                                                                                                                         double x = Double.parseDouble(document.getY());
                                                                                                                         double y = Double.parseDouble(document.getX());
-                                                                                                                        //카카오맵은 참고로 new MapPoint()로  생성못함. 좌표기준이 여러개라 이렇게 메소드로 생성해야함
+
                                                                                                                         MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(x, y);
                                                                                                                         marker.setMapPoint(mapPoint);
-                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
-                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_bank_marker); // 마커 이미지.
-                                                                                                                        marker.setCustomImageAutoscale(false); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
+                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage);
+                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_bank_marker);
+                                                                                                                        marker.setCustomImageAutoscale(false);
                                                                                                                         marker.setCustomImageAnchor(0.5f, 1.0f);
                                                                                                                         mMapView.addPOIItem(marker);
                                                                                                                     }
@@ -895,12 +878,12 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                                                                                                                         marker.setTag(tagNum++);
                                                                                                                         double x = Double.parseDouble(document.getY());
                                                                                                                         double y = Double.parseDouble(document.getX());
-                                                                                                                        //카카오맵은 참고로 new MapPoint()로  생성못함. 좌표기준이 여러개라 이렇게 메소드로 생성해야함
+
                                                                                                                         MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(x, y);
                                                                                                                         marker.setMapPoint(mapPoint);
-                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
-                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_hospital_marker); // 마커 이미지.
-                                                                                                                        marker.setCustomImageAutoscale(false); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
+                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage);
+                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_hospital_marker);
+                                                                                                                        marker.setCustomImageAutoscale(false);
                                                                                                                         marker.setCustomImageAnchor(0.5f, 1.0f);
                                                                                                                         mMapView.addPOIItem(marker);
                                                                                                                     }
@@ -910,15 +893,15 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                                                                                                                         marker.setTag(tagNum++);
                                                                                                                         double x = Double.parseDouble(document.getY());
                                                                                                                         double y = Double.parseDouble(document.getX());
-                                                                                                                        //카카오맵은 참고로 new MapPoint()로  생성못함. 좌표기준이 여러개라 이렇게 메소드로 생성해야함
+
                                                                                                                         MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(x, y);
                                                                                                                         marker.setMapPoint(mapPoint);
-                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
-                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_pharmacy_marker); // 마커 이미지.
-                                                                                                                        marker.setCustomImageAutoscale(false); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
+                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage);
+                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_pharmacy_marker);
+                                                                                                                        marker.setCustomImageAutoscale(false);
                                                                                                                         marker.setCustomImageAnchor(0.5f, 1.0f);
                                                                                                                         mMapView.addPOIItem(marker);
-                                                                                                                        //자세히보기 fab 버튼 보이게
+
                                                                                                                         mLoaderLayout.setVisibility(View.GONE);
                                                                                                                         searchDetailFab.setVisibility(View.VISIBLE);
                                                                                                                     }
@@ -928,15 +911,15 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                                                                                                                         marker.setTag(tagNum++);
                                                                                                                         double x = Double.parseDouble(document.getY());
                                                                                                                         double y = Double.parseDouble(document.getX());
-                                                                                                                        //카카오맵은 참고로 new MapPoint()로  생성못함. 좌표기준이 여러개라 이렇게 메소드로 생성해야함
+
                                                                                                                         MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(x, y);
                                                                                                                         marker.setMapPoint(mapPoint);
-                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
-                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_cafe_marker); // 마커 이미지.
-                                                                                                                        marker.setCustomImageAutoscale(false); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
+                                                                                                                        marker.setMarkerType(MapPOIItem.MarkerType.CustomImage);
+                                                                                                                        marker.setCustomImageResourceId(R.drawable.ic_cafe_marker);
+                                                                                                                        marker.setCustomImageAutoscale(false);
                                                                                                                         marker.setCustomImageAnchor(0.5f, 1.0f);
                                                                                                                         mMapView.addPOIItem(marker);
-                                                                                                                        //자세히보기 fab 버튼 보이게
+
                                                                                                                         mLoaderLayout.setVisibility(View.GONE);
                                                                                                                         searchDetailFab.setVisibility(View.VISIBLE);
                                                                                                                     }
@@ -1055,10 +1038,10 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     public void onMapViewZoomLevelChanged(MapView mapView, int i) {
     }
 
-    //맵 한번 클릭시 호출
+
     @Override
     public void onMapViewSingleTapped(MapView mapView, MapPoint mapPoint) {
-        //검색창켜져있을때 맵클릭하면 검색창 사라지게함
+
         recyclerView.setVisibility(View.GONE);
     }
 
@@ -1097,7 +1080,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
 
     }
 
-    // 길찾기 카카오맵 호출( 카카오맵앱이 없을 경우 플레이스토어 링크로 이동)
+
     public void showMap(Uri geoLocation) {
         Intent intent;
         try {
@@ -1117,7 +1100,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem) {
     }
 
-    //말풍선(POLLITEM) 클릭시 호출
+
     @Override
     public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem, MapPOIItem.CalloutBalloonButtonType calloutBalloonButtonType) {
         double lat = mapPOIItem.getMapPoint().getMapPointGeoCoord().latitude;
@@ -1160,7 +1143,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                     mLoaderLayout.setVisibility(View.GONE);
                     dialogInterface.dismiss();
 
-                    //create destination file
+
 
                     Storage storage = new Storage(getContext());
                     storage.setEncryptConfiguration(configuration);
@@ -1185,7 +1168,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
 
     }
 
-    // 마커 드래그이동시 호출
+
     @Override
     public void onDraggablePOIItemMoved(MapView mapView, MapPOIItem mapPOIItem, MapPoint mapPoint) {
         MapPoint.GeoCoordinate mapPointGeo = mapPoint.getMapPointGeoCoord();
@@ -1196,28 +1179,26 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
         searchMarker.setItemName(mSearchName);
         MapPoint mapPoint2 = MapPoint.mapPointWithGeoCoord(mSearchLat, mSearchLng);
         searchMarker.setMapPoint(mapPoint2);
-        searchMarker.setMarkerType(MapPOIItem.MarkerType.BluePin); // 기본으로 제공하는 BluePin 마커 모양.
-        searchMarker.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+        searchMarker.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        searchMarker.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
         searchMarker.setDraggable(true);
         mMapView.addPOIItem(searchMarker);
     }
 
-    /*
-     *  현재 위치 업데이트(setCurrentLocationEventListener)
-     */
+
     @Override
     public void onCurrentLocationUpdate(MapView mapView, MapPoint mapPoint, float accuracyInMeters) {
         MapPoint.GeoCoordinate mapPointGeo = mapPoint.getMapPointGeoCoord();
         Log.i(TAG, String.format("MapView onCurrentLocationUpdate (%f,%f) accuracy (%f)", mapPointGeo.latitude, mapPointGeo.longitude, accuracyInMeters));
         currentMapPoint = MapPoint.mapPointWithGeoCoord(mapPointGeo.latitude, mapPointGeo.longitude);
-        //이 좌표로 지도 중심 이동
+
         mMapView.setMapCenterPoint(currentMapPoint, true);
-        //전역변수로 현재 좌표 저장
+
         mCurrentLat = mapPointGeo.latitude;
         mCurrentLng = mapPointGeo.longitude;
         Log.d(TAG, "현재위치 => " + mCurrentLat + "  " + mCurrentLng);
         mLoaderLayout.setVisibility(View.GONE);
-        //트래킹 모드가 아닌 단순 현재위치 업데이트일 경우, 한번만 위치 업데이트하고 트래킹을 중단시키기 위한 로직
+
         if(!isTrackingMode)
             mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
     }
@@ -1239,8 +1220,8 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
         mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
     }
 
-    @Subscribe //검색예시 클릭시 이벤트 오토버스
-    public void search(Document document) {//public항상 붙여줘야함
+    @Subscribe
+    public void search(Document document) {
         FancyToast.makeText(getActivity(), document.getPlaceName() + " 검색", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
         mSearchName = document.getPlaceName();
         mSearchLng = Double.parseDouble(document.getX());
@@ -1251,9 +1232,9 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
         searchMarker.setTag(10000);
         MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(mSearchLat, mSearchLng);
         searchMarker.setMapPoint(mapPoint);
-        searchMarker.setMarkerType(MapPOIItem.MarkerType.BluePin); // 기본으로 제공하는 BluePin 마커 모양.
-        searchMarker.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
-        //마커 드래그 가능하게 설정
+        searchMarker.setMarkerType(MapPOIItem.MarkerType.BluePin);
+        searchMarker.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
+
         searchMarker.setDraggable(true);
         mMapView.addPOIItem(searchMarker);
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(INPUT_METHOD_SERVICE);
@@ -1265,18 +1246,14 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     public void onDestroyView(){
         super.onDestroyView();
         bus.unregister(this);
-        /*if(isThread){
-            FancyToast.makeText(getActivity(), "페이지 이동 시 귀가 서비스가 종료됩니다.", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
-            //thread.getth
-        }*/
+
         if (isTrackingMode) {
             mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
             mMapView.setShowCurrentLocationMarker(false);
         }
     }
 
-    //Notification
-    //Notification
+
     public void NotificationSomethings(String content_msg) {
 
         NotificationManager notificationManager = (NotificationManager)getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -1287,7 +1264,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
         PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0, notificationIntent,  PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), NOTIFICATION_CHANNEL_ID)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground)) //BitMap 이미지 요구
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground))
                 .setContentTitle("The Day I Drunk")
                 .setContentText(content_msg)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -1313,18 +1290,5 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
         notificationManager.notify(10000, builder.build());
     }
 
-/*    @Override
-    public void finish() {
-        getActivity().finish();
-        bus.unregister(this); //이액티비티 떠나면 정류소 해제해줌
-    }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (isTrackingMode) {
-            mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
-            mMapView.setShowCurrentLocationMarker(false);
-        }
-    }*/
 }

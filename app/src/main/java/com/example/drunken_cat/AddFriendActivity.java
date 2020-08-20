@@ -36,7 +36,7 @@ public class AddFriendActivity extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.activity_addfriend, container, false);
-        /* 귀가천사 변수 선언 및 init */
+
 
 
         friend_name_1 = view.findViewById(R.id.friend_name_1);
@@ -48,11 +48,11 @@ public class AddFriendActivity extends Fragment {
 
         btn_register_friend = (Button) view.findViewById(R.id.btn_register_friend);
 
-        //encrypt and decrypt file
-        final String IVX = "abcdefghijklmnop"; // 16 lenght - not secret
+
+        final String IVX = "abcdefghijklmnop";
         final String SECRET_KEY = android.provider.Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        final byte[] SALT = "0000111100001111".getBytes(); // random 16 bytes array
+        final byte[] SALT = "0000111100001111".getBytes();
         final EncryptConfiguration configuration = new EncryptConfiguration.Builder()
                 .setEncryptContent(IVX, SECRET_KEY, SALT)
                 .build();
@@ -74,7 +74,7 @@ public class AddFriendActivity extends Fragment {
             friend_phone_3.setText(text[5]);
         }
 
-        //등록 버튼 클릭 시
+
         btn_register_friend.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
