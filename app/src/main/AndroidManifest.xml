@@ -32,16 +32,14 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-
                 <action android:name="com.google.android.gms.actions.RESERVE_TAXI_RESERVATION" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity android:name=".PlaceDetailActivity"/>
         <activity android:name=".MapSearchDetailActivity"/>
+        <activity android:name=".OverlayActivity"/>
         <activity android:name=".SplashActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <service android:name=".VoiceBackgroundActivity"/>

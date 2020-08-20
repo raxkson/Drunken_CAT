@@ -56,9 +56,12 @@ import com.snatik.storage.Storage;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import net.daum.mf.map.api.CameraUpdateFactory;
 import net.daum.mf.map.api.MapCircle;
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
+import net.daum.mf.map.api.MapPointBounds;
+import net.daum.mf.map.api.MapPolyline;
 import net.daum.mf.map.api.MapView;
 
 import org.jetbrains.annotations.NotNull;
@@ -87,7 +90,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     private int count;
 
     //xml
-
+    public String locationString = "";
     String IVX = "abcdefghijklmnop"; // 16 lenght - not secret
     String SECRET_KEY;
     byte[] SALT = "0000111100001111".getBytes(); // random 16 bytes array
@@ -97,7 +100,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     EditText mSearchEdit;
     private Animation fab_open, fab_close;
     private Boolean isFabOpen = false;
-    private FloatingActionButton fab, fab1, fab2, fab3, searchDetailFab, stopTrackingFab, goHome, stopGoHomeFab;
+    private FloatingActionButton fab, fab1, fab2, fab3, searchDetailFab, stopTrackingFab, goHome, stopGoHomeFab, overlayFab, eraseMarker;
     RelativeLayout mLoaderLayout;
     RecyclerView recyclerView;
     //value
@@ -176,9 +179,12 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
         fab2 = view.findViewById(R.id.fab2);
         fab3 = view.findViewById(R.id.fab3);
         goHome = view.findViewById(R.id.gohome);
+        overlayFab = view.findViewById(R.id.overlay);
+
         searchDetailFab = view.findViewById(R.id.fab_detail);
         stopTrackingFab = view.findViewById(R.id.fab_stop_tracking);
         stopGoHomeFab = view.findViewById(R.id.fab_stop_goHome);
+        eraseMarker = view.findViewById(R.id.fab_erase_marker);
         mLoaderLayout = view.findViewById(R.id.loaderLayout);
         mMapView = new MapView(getActivity());
         mMapViewContainer = view.findViewById(R.id.map_mv_mapcontainer);
@@ -208,9 +214,11 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
         fab2.setOnClickListener(this);
         fab3.setOnClickListener(this);
         goHome.setOnClickListener(this);
+        overlayFab.setOnClickListener(this);
         searchDetailFab.setOnClickListener(this);
         stopTrackingFab.setOnClickListener(this);
         stopGoHomeFab.setOnClickListener(this);
+        eraseMarker.setOnClickListener(this);
 
         Toast.makeText(getActivity(), "맵을 로딩중입니다", Toast.LENGTH_SHORT).show();
 
@@ -323,6 +331,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 isTrackingMode = false;
                 FancyToast.makeText(getActivity(), "현재위치기준 1km 검색 시작", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
                 stopTrackingFab.setVisibility(View.GONE);
+                eraseMarker.setVisibility(View.VISIBLE);
                 mLoaderLayout.setVisibility(View.VISIBLE);
                 anim();
                 //현재 위치 기준으로 1km 검색
@@ -341,6 +350,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                     mMapView.removeAllCircles();
                     mMapView.addPOIItem(searchMarker);
                     requestSearchLocal(mSearchLng, mSearchLat);
+                    eraseMarker.setVisibility(View.VISIBLE);
                 } else {
                     FancyToast.makeText(getActivity(), "검색 먼저 해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
                 }
@@ -368,24 +378,54 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                     mLoaderLayout.setVisibility(View.GONE);
 
                     updateLocation();
-                /*
-                    thread =  new Thread(){
-                        @Override
-                        public void run(){
-                            while(isThread){
-                                try {
-                                    sleep(10000);
-                                } catch (InterruptedException e) {
-                                    System.out.println("Error");
-                                }
-                                handler.sendEmptyMessage(1);
-                            }
-                        }
-                    };
-                    thread.start();*/
                 } else {
                     FancyToast.makeText(getActivity(), "목적지를 등록해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
                 }
+                break;
+            case R.id.overlay:
+                mLoaderLayout.setVisibility(View.VISIBLE);
+                eraseMarker.setVisibility(View.VISIBLE);
+                anim();
+                mLoaderLayout.setVisibility(View.GONE);
+
+                storage = new Storage(getContext());
+                path = storage.getInternalFilesDirectory();
+                Filepath = path + "Location.txt";
+                fileExists = storage.isFileExist(Filepath);
+                String content;
+                if(fileExists) {
+                    content = storage.readTextFile(Filepath);
+                    System.out.println(content);
+                    String[] text = content.split("\n");
+                    MapPolyline polyline = new MapPolyline();
+                    for(int i = 0; i < text.length; i++){
+                        String[] txt = text[i].split("★");
+                        double latitude = Double.parseDouble(txt[0]);
+                        double longitude = Double.parseDouble(txt[1]);
+                        //카카오맵은 참고로 new MapPoint()로  생성못함. 좌표기준이 여러개라 이렇게 메소드로 생성해야함
+                        MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(latitude, longitude);
+                        MapPOIItem marker = new MapPOIItem();
+                        marker.setItemName(txt[2]);
+                        marker.setTag(0);
+                        marker.setMapPoint(mapPoint);
+                        marker.setMarkerType(MapPOIItem.MarkerType.BluePin); // 기본으로 제공하는 BluePin 마커 모양.
+                        marker.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+                        mMapView.addPOIItem(marker);
+                        polyline.setTag(1000);
+                        polyline.setLineColor(Color.argb(128, 255, 51, 0)); // Polyline 컬러 지정.
+// Polyline 좌표 지정.
+                        polyline.addPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude));
+// Polyline 지도에 올리기.
+
+                    }
+                    mMapView.addPolyline(polyline);
+
+// 지도뷰의 중심좌표와 줌레벨을 Polyline이 모두 나오도록 조정.
+                    MapPointBounds mapPointBounds = new MapPointBounds(polyline.getMapPoints());
+                    int padding = 100; // px
+                    mMapView.moveCamera(CameraUpdateFactory.newMapPointBounds(mapPointBounds, padding));
+                }
+
                 break;
             case R.id.fab_detail:
                 FancyToast.makeText(getActivity(), "검색결과 상세보기", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
@@ -411,18 +451,33 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 break;
             case R.id.fab_stop_goHome:
                 //isThread = false;
+                storage = new Storage(getContext());
+                path = storage.getInternalFilesDirectory();
+                Filepath = path + "Location.txt";
+                fileExists = storage.isFileExist(Filepath);
+                if(fileExists)
+                    storage.deleteFile(Filepath);
+                if(locationString != "")
+                    storage.createFile(Filepath, locationString);
                 if(record_switch)
                     getActivity().stopService(new Intent(getActivity(), VoiceBackgroundActivity.class));// 추가
                 mmHandler.removeCallbacksAndMessages(null);
                 stopGoHomeFab.setVisibility(View.GONE);
                 FancyToast.makeText(getActivity(), "귀가 서비스 종료", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
+                break;
+            case R.id.fab_erase_marker:
+                mMapView.removeAllPolylines();
+                mMapView.removeAllPOIItems();
+                mMapView.removeAllCircles();
+                eraseMarker.setVisibility(View.GONE);
+                break;
             default:
                 break;
         }
     }
 
 
-    private Runnable updateLocationtask = new Runnable() {
+    private final Runnable updateLocationtask = new Runnable() {
         @Override
         public void run() {
 
@@ -430,6 +485,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
             storage.setEncryptConfiguration(configuration);
             String path = storage.getInternalFilesDirectory();
             String Filepath = path + "Location.txt";
+            boolean fileExists = false;
             boolean GPSEnabled = false;
             boolean NetworkEnabled = false;
             boolean PassiveEnabled = false;
@@ -449,124 +505,127 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
 
             Location location = null;
 
-                if (GPSEnabled) {
-                   lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+            if (GPSEnabled) {
+                lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                        0,
+                        0,
+                        mLocationListener);
+                location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if (location != null) {
+                    cur_longitude = location.getLongitude();
+                    cur_latitude = location.getLatitude();
+                    Toast.makeText(getContext(), "GPS", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            if (NetworkEnabled) {
+                if (location == null) {
+                    lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                             0,
                             0,
                             mLocationListener);
-                    location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    if(location != null){
+                    location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    if (location != null) {
                         cur_longitude = location.getLongitude();
                         cur_latitude = location.getLatitude();
-                        Toast.makeText(getContext(), "GPS", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "NET", Toast.LENGTH_SHORT).show();
                     }
                 }
+            }
 
-                if(NetworkEnabled){
-                    if(location == null){
-                        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                                0,
-                                0,
-                                mLocationListener);
-                        location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                        if (location != null) {
-                            cur_longitude = location.getLongitude();
-                            cur_latitude = location.getLatitude();
-                            Toast.makeText(getContext(), "NET", Toast.LENGTH_SHORT).show();
-                        }
+            if (PassiveEnabled) {
+                if (location == null) {
+                    lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER,
+                            0,
+                            0,
+                            mLocationListener);
+                    location = lm.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+                    if (location != null) {
+                        cur_longitude = location.getLongitude();
+                        cur_latitude = location.getLatitude();
+                        Toast.makeText(getContext(), "PASSIVE", Toast.LENGTH_SHORT).show();
                     }
                 }
+            }
 
-                if(PassiveEnabled){
-                    if(location == null){
-                        lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER,
-                                0,
-                                0,
-                                mLocationListener);
-                        location = lm.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-                        if (location != null) {
-                            cur_longitude = location.getLongitude();
-                            cur_latitude = location.getLatitude();
-                            Toast.makeText(getContext(), "PASSIVE", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-
-
-
-
-                boolean fileExists = storage.isFileExist(Filepath);
+                /*boolean fileExists = storage.isFileExist(Filepath);
                 if(fileExists)
-                    storage.appendFile(Filepath, Double.toString(cur_longitude)+" "+Double.toString(cur_latitude)+" "+formatDate+"\n");
+                    storage.appendFile(Filepath, "★" + cur_longitude +"★"+ cur_latitude +"★"+formatDate);
                 else
-                    storage.createFile(Filepath, Double.toString(cur_longitude)+" "+Double.toString(cur_latitude)+" "+formatDate+"\n");
+                    storage.createFile(Filepath, "★" + cur_longitude +"★"+ cur_latitude +"★"+formatDate);*/
+            locationString += cur_latitude + "★" + cur_longitude + "★" + formatDate + "\n";
+            System.out.println(locationString);
+            cur_distance = distanceInKilometerByHaversine(dst_latitude, dst_longitude, cur_latitude, cur_longitude);
+            Toast.makeText(getContext(), Double.toString(cur_distance), Toast.LENGTH_SHORT).show();
 
-                cur_distance = distanceInKilometerByHaversine(dst_latitude, dst_longitude, cur_latitude, cur_longitude);
-                Toast.makeText(getContext(), Double.toString(cur_distance), Toast.LENGTH_SHORT).show();
-                if(cur_distance < 1){//목적지 도착
-                    NotificationSomethings("목적지 도착");
-                    Toast.makeText(getContext(), "목적지 도착", Toast.LENGTH_SHORT).show();
-                    //isThread = false;
-                    if(record_switch)
-                        getActivity().stopService(new Intent(getActivity(),VoiceBackgroundActivity.class));
-                    lm.removeUpdates(mLocationListener);
+            if (cur_distance < 1) {//목적지 도착
+                NotificationSomethings("목적지 도착");
+                Toast.makeText(getContext(), "목적지 도착", Toast.LENGTH_SHORT).show();
+                //isThread = false;
+                fileExists = storage.isFileExist(Filepath);
+                if (fileExists) {
+                    storage.deleteFile(Filepath);
                 }
-                if(cur_distance > bef_distance + 0.005){//SOS
-                    NotificationSomethings("경로이탈");
-                    Toast.makeText(getContext(), "경로이탈", Toast.LENGTH_SHORT).show();
+                if(locationString != "")
+                    storage.createFile(Filepath, locationString);
+                if (record_switch)
+                    getActivity().stopService(new Intent(getActivity(), VoiceBackgroundActivity.class));
+                lm.removeUpdates(mLocationListener);
+            }
+            if (cur_distance > bef_distance + 0.005) {//SOS
+                NotificationSomethings("경로이탈");
+                Toast.makeText(getContext(), "경로이탈", Toast.LENGTH_SHORT).show();
 
-                    Filepath = path + "Friend.txt";
-
-
-                    fileExists = storage.isFileExist(Filepath);
-                    if(fileExists){
-                        String content = storage.readTextFile(Filepath);
-                        //name1☎phone1☎name2☎phone2☎name3☎phone3
-                        String[] text = content.split("☎");
-                        try{
-                            SmsManager smsManager = SmsManager.getDefault();
-                            for(int i = 1; i < 6; i+=2){
-                                smsManager.sendTextMessage(text[i], null, "다들 맛있는거 내가 다 쏜다!", null, null);
-                                Toast.makeText(getContext(), text[i], Toast.LENGTH_SHORT).show();
-                            }
-                            Toast.makeText(getContext(), "SMS Send Success", Toast.LENGTH_SHORT).show();
-                        } catch(Exception e){
-                            Toast.makeText(getContext(), "SMS Send failed", Toast.LENGTH_SHORT).show();
-                            System.out.println("Error");
+                Filepath = path + "Friend.txt";
+                fileExists = storage.isFileExist(Filepath);
+                if (fileExists) {
+                    String content = storage.readTextFile(Filepath);
+                    //name1☎phone1☎name2☎phone2☎name3☎phone3
+                    String[] text = content.split("☎");
+                    try {
+                        SmsManager smsManager = SmsManager.getDefault();
+                        for (int i = 1; i < 6; i += 2) {
+                            smsManager.sendTextMessage(text[i], null, "다들 맛있는거 내가 다 쏜다!", null, null);
+                            Toast.makeText(getContext(), text[i], Toast.LENGTH_SHORT).show();
                         }
-                    }else{
-                        FancyToast.makeText(getContext(), "지인 등록이 되어있지 않습니다. 지인을 등록해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
+                        Toast.makeText(getContext(), "SMS Send Success", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "SMS Send failed", Toast.LENGTH_SHORT).show();
+                        System.out.println("Error");
                     }
-
+                } else {
+                    FancyToast.makeText(getContext(), "지인 등록이 되어있지 않습니다. 지인을 등록해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
                 }
+
+            }
 
             tmp_distance = distanceInKilometerByHaversine(bef_latitude, bef_longitude, cur_latitude, cur_longitude);
-            if(tmp_distance < 1 && bef_latitude != 2000 && bef_longitude != 2000){//SOS
-                    NotificationSomethings("움직임이 감지되지 않습니다");
-                    Toast.makeText(getContext(), "움직임 없음", Toast.LENGTH_SHORT).show();
+            if (tmp_distance < 1 && bef_latitude != 2000 && bef_longitude != 2000) {//SOS
+                NotificationSomethings("움직임이 감지되지 않습니다");
+                Toast.makeText(getContext(), "움직임 없음", Toast.LENGTH_SHORT).show();
 
-                    Filepath = path + "Friend.txt";
+                Filepath = path + "Friend.txt";
 
 
-                    fileExists = storage.isFileExist(Filepath);
-                    if(fileExists){
-                        String content = storage.readTextFile(Filepath);
-                        //name1☎phone1☎name2☎phone2☎name3☎phone3
-                        String[] text = content.split("☎");
-                        try{
-                            SmsManager smsManager = SmsManager.getDefault();
-                            for(int i = 1; i < 6; i+=2){
-                                smsManager.sendTextMessage(text[i], null, "다들 맛있는거 내가 다 쏜다!", null, null);
-                                Toast.makeText(getContext(), text[i], Toast.LENGTH_SHORT).show();
-                            }
-                            Toast.makeText(getContext(), "SMS Send Success", Toast.LENGTH_SHORT).show();
-                        } catch(Exception e){
-                            Toast.makeText(getContext(), "SMS Send failed", Toast.LENGTH_SHORT).show();
-                            System.out.println("Error");
+                fileExists = storage.isFileExist(Filepath);
+                if (fileExists) {
+                    String content = storage.readTextFile(Filepath);
+                    //name1☎phone1☎name2☎phone2☎name3☎phone3
+                    String[] text = content.split("☎");
+                    try {
+                        SmsManager smsManager = SmsManager.getDefault();
+                        for (int i = 1; i < 6; i += 2) {
+                            smsManager.sendTextMessage(text[i], null, "다들 맛있는거 내가 다 쏜다!", null, null);
+                            Toast.makeText(getContext(), text[i], Toast.LENGTH_SHORT).show();
                         }
-                    }else{
-                        FancyToast.makeText(getContext(), "지인 등록이 되어있지 않습니다. 지인을 등록해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
+                        Toast.makeText(getContext(), "SMS Send Success", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "SMS Send failed", Toast.LENGTH_SHORT).show();
+                        System.out.println("Error");
                     }
+                } else {
+                    FancyToast.makeText(getContext(), "지인 등록이 되어있지 않습니다. 지인을 등록해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
+                }
 
             }
             bef_distance = cur_distance;
@@ -940,20 +999,24 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
             fab2.startAnimation(fab_close);
             fab3.startAnimation(fab_close);
             goHome.startAnimation(fab_close);
+            overlayFab.startAnimation(fab_close);
             fab1.setClickable(false);
             fab2.setClickable(false);
             fab3.setClickable(false);
             goHome.setClickable(false);
+            overlayFab.setClickable(false);
             isFabOpen = false;
         } else {
             fab1.startAnimation(fab_open);
             fab2.startAnimation(fab_open);
             fab3.startAnimation(fab_open);
             goHome.startAnimation(fab_open);
+            overlayFab.startAnimation(fab_open);
             fab1.setClickable(true);
             fab2.setClickable(true);
             fab3.setClickable(true);
             goHome.setClickable(true);
+            overlayFab.setClickable(true);
             isFabOpen = true;
         }
     }

@@ -45,6 +45,20 @@
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/overlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="15sp"
+        android:layout_marginBottom="440dp"
+        android:src="@drawable/ic_marker"
+        android:visibility="invisible"
+        app:backgroundTint="#ffffff"
+        app:elevation="6dp"
+        app:pressedTranslationZ="12dp"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/gohome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -148,6 +162,19 @@
         android:layout_gravity="bottom|start"
         android:layout_marginLeft="15sp"
         android:layout_marginBottom="90dp"
+        android:src="@drawable/ic_stop_red_24dp"
+        app:elevation="6dp"
+        app:pressedTranslationZ="12dp"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_erase_marker"
+        android:layout_width="wrap_content"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_marginLeft="15sp"
+        android:layout_marginBottom="160dp"
         android:src="@drawable/ic_stop_red_24dp"
         app:elevation="6dp"
         app:pressedTranslationZ="12dp"
