@@ -26,13 +26,12 @@ public class RecordingActivity extends Fragment
 
     private ImageButton Play;
     private SeekBar progressBar;
-    private TextView songTitleLabel;
     private TextView songCurrentTime;
     private TextView songTotalTime;
-    private static  MediaPlayer media;
+    private MediaPlayer media;
     private Handler mHandler = new Handler();
     private Utilities utils;
-    private  View view;
+    private View view;
     public String filename="";
 
     @Override
@@ -46,7 +45,6 @@ public class RecordingActivity extends Fragment
 
         Play = (ImageButton) view.findViewById(R.id.play);
         progressBar = (SeekBar) view.findViewById(R.id.seekBar3);
-        songTitleLabel = (TextView) view.findViewById(R.id.songTitle);
         songCurrentTime = (TextView) view.findViewById(R.id.songCurrentTime);
         songTotalTime = (TextView) view.findViewById(R.id.songTotalTime);
 
@@ -76,15 +74,13 @@ public class RecordingActivity extends Fragment
         Play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (media.isPlaying()) {
-                    if (media != null) {
-                        media.pause();
-                        Play.setImageResource(R.drawable.ic_play);
-                    }
-                } else {
-                    if (media != null) {
-                        playSong();
-                        Play.setImageResource(R.drawable.ic_pause);
+                if (media != null) {
+                    if (media.isPlaying()) {
+                            media.pause();
+                            Play.setImageResource(R.drawable.ic_play);
+                    } else {
+                            playSong();
+                            Play.setImageResource(R.drawable.ic_pause);
                     }
                 }
             }
@@ -94,7 +90,7 @@ public class RecordingActivity extends Fragment
 
     public void  playSong() {
         //media.reset();
-        if(media.getDuration() == media.getCurrentPosition() || media.getCurrentPosition() == 0){
+        if(media.getCurrentPosition() == 0){
             media.reset();
             try {
                 media.setDataSource(filename);

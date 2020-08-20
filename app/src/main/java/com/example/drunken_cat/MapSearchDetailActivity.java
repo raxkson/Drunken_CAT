@@ -74,15 +74,15 @@ public class MapSearchDetailActivity extends AppCompatActivity {
     }
 
     private void initView(){
-        float itemCnt1 = bigMartList.size();
-        float itemCnt2 = gs24List.size();
-        float itemCnt3 = schoolList.size();
-        float itemCnt4 = academyList.size();
-        float itemCnt5 = subwayList.size();
-        float itemCnt6 = bankList.size();
-        float itemCnt7 = hospitalList.size();
-        float itemCnt8 = pharmacyList.size();
-        float itemCnt9 = cafeList.size();
+        double itemCnt1 = bigMartList.size();
+        double itemCnt2 = gs24List.size();
+        double itemCnt3 = schoolList.size();
+        double itemCnt4 = academyList.size();
+        double itemCnt5 = subwayList.size();
+        double itemCnt6 = bankList.size();
+        double itemCnt7 = hospitalList.size();
+        double itemCnt8 = pharmacyList.size();
+        double itemCnt9 = cafeList.size();
         itemCntText1.setText("" +(int) itemCnt1);
         itemCntText2.setText("" +(int) itemCnt2);
         itemCntText3.setText("" +(int) itemCnt3);
@@ -122,9 +122,9 @@ public class MapSearchDetailActivity extends AppCompatActivity {
         if(itemCnt9 > 10){
             itemCnt9 = 10;
         }
-        float averageScore = Math.round((itemCnt1 + itemCnt2 + itemCnt3 + itemCnt4 + itemCnt5 + itemCnt6 + itemCnt7 + itemCnt8 + itemCnt9)/10*10 /10.0 );
+        double averageScore = Math.round((itemCnt1 + itemCnt2 + itemCnt3 + itemCnt4 + itemCnt5 + itemCnt6 + itemCnt7 + itemCnt8 + itemCnt9)/10*10 /10.0 );
         ratingScore.setText(averageScore+"");
-        ratingBar.setRating(averageScore/2);
+        ratingBar.setRating((float) (averageScore/2));
     }
 
     //차트생성

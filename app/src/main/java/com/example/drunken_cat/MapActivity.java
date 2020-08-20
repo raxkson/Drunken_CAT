@@ -32,6 +32,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -60,6 +61,7 @@ import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapView;
 
 import org.jetbrains.annotations.NotNull;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -73,10 +75,10 @@ import android.view.inputmethod.InputMethodManager;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
 
-public class MapActivity extends Fragment implements  MapView.MapViewEventListener, MapView.POIItemEventListener, MapView.OpenAPIKeyAuthenticationResultListener, View.OnClickListener, MapView.CurrentLocationEventListener {
+public class MapActivity extends Fragment implements MapView.MapViewEventListener, MapView.POIItemEventListener, MapView.OpenAPIKeyAuthenticationResultListener, View.OnClickListener, MapView.CurrentLocationEventListener {
     final static String TAG = "MapTAG";
 
-        //storage.setEncryptConfiguration(configuration);
+    //storage.setEncryptConfiguration(configuration);
 
     //Notification
     //Notification
@@ -141,8 +143,8 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-       view = inflater.inflate(R.layout.activity_map, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.activity_map, container, false);
 
         bus.register(this); //정류소 등록
         mSearchEdit = view.findViewById(R.id.map_et_search);
@@ -161,14 +163,14 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
         mMapViewContainer = view.findViewById(R.id.map_mv_mapcontainer);
         mMapViewContainer.addView(mMapView);
         recyclerView = view.findViewById(R.id.map_recyclerview);
-            initView();
+        initView();
         return view;
     }
 
 
     private void initView() {
 
-        LocationAdapter locationAdapter = new LocationAdapter(documentArrayList, getActivity(), mSearchEdit, recyclerView);
+        LocationAdapter locationAdapter = new LocationAdapter(documentArrayList, mSearchEdit, recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false); //레이아웃매니저 생성
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL)); //아래구분선 세팅
         recyclerView.setLayoutManager(layoutManager);
@@ -194,8 +196,8 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
         //맵 리스너 (현재위치 업데이트)
         mMapView.setCurrentLocationEventListener(this);
         //setCurrentLocationTrackingMode (지도랑 현재위치 좌표 찍어주고 따라다닌다.)
-        if(        ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_FINE_LOCATION) ==  PackageManager.PERMISSION_GRANTED)
+        if (ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
             mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading);
 
         mLoaderLayout.setVisibility(View.VISIBLE);
@@ -267,10 +269,9 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
         });
     }
 
-    public void updateLocation(){
+    public void updateLocation() {
         mmHandler.postDelayed(updateLocationtask, 5000);
     }
-
 
 
     @Override
@@ -327,7 +328,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                 String path = storage.getInternalFilesDirectory();
                 String Filepath = path + "Destination.txt";
                 boolean fileExists = storage.isFileExist(Filepath);
-                if(fileExists){
+                if (fileExists) {
                     String[] arr = storage.readTextFile(Filepath).split(" ");
                     dst_latitude = Double.parseDouble(arr[0]);
                     dst_longitude = Double.parseDouble(arr[1]);
@@ -357,7 +358,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                         }
                     };
                     thread.start();*/
-                }else{
+                } else {
                     FancyToast.makeText(getActivity(), "목적지를 등록해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
                 }
                 break;
@@ -402,31 +403,35 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
             storage.setEncryptConfiguration(configuration);
             String path = storage.getInternalFilesDirectory();
             String Filepath = path + "Location.txt";
-
+            boolean GPSEnabled = false;
+            boolean NetworkEnabled = false;
+            boolean PassiveEnabled = false;
             final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-            boolean GPSEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            boolean NetworkEnabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-            boolean PassiveEnabled = lm.isProviderEnabled(LocationManager.PASSIVE_PROVIDER);
-            long now =  System.currentTimeMillis();
+            if (lm == null) {
+                System.out.println("nullcheck");
+            } else {
+                GPSEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                NetworkEnabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                PassiveEnabled = lm.isProviderEnabled(LocationManager.PASSIVE_PROVIDER);
+            }
+            long now = System.currentTimeMillis();
             Date date = new Date(now);
             SimpleDateFormat sdfNow = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             String formatDate = sdfNow.format(date);
 
 
-                Location location = null;
+            Location location = null;
 
-                if(GPSEnabled){
-                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                if (GPSEnabled) {
+                   lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                             0,
                             0,
                             mLocationListener);
-                    if(lm != null){
-                        location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                        if(location != null){
-                            cur_longitude = location.getLongitude();
-                            cur_latitude = location.getLatitude();
-                            Toast.makeText(getContext(), "GPS", Toast.LENGTH_SHORT).show();
-                        }
+                    location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    if(location != null){
+                        cur_longitude = location.getLongitude();
+                        cur_latitude = location.getLatitude();
+                        Toast.makeText(getContext(), "GPS", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -436,13 +441,11 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                                 0,
                                 0,
                                 mLocationListener);
-                        if(lm != null) {
-                            location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                            if (location != null) {
-                                cur_longitude = location.getLongitude();
-                                cur_latitude = location.getLatitude();
-                                Toast.makeText(getContext(), "NET", Toast.LENGTH_SHORT).show();
-                            }
+                        location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        if (location != null) {
+                            cur_longitude = location.getLongitude();
+                            cur_latitude = location.getLatitude();
+                            Toast.makeText(getContext(), "NET", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -453,16 +456,16 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                                 0,
                                 0,
                                 mLocationListener);
-                        if(lm != null) {
-                            location = lm.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-                            if (location != null) {
-                                cur_longitude = location.getLongitude();
-                                cur_latitude = location.getLatitude();
-                                Toast.makeText(getContext(), "PASSIVE", Toast.LENGTH_SHORT).show();
-                            }
+                        location = lm.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+                        if (location != null) {
+                            cur_longitude = location.getLongitude();
+                            cur_latitude = location.getLatitude();
+                            Toast.makeText(getContext(), "PASSIVE", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
+
+
 
 
                 boolean fileExists = storage.isFileExist(Filepath);

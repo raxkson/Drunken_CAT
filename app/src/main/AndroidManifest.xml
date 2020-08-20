@@ -40,7 +40,6 @@
         </activity>
         <activity android:name=".PlaceDetailActivity"/>
         <activity android:name=".MapSearchDetailActivity"/>
-        <activity android:name=".MapNavigationActivity" />
         <activity android:name=".SplashActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <service android:name=".VoiceBackgroundActivity"/>

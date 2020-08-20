@@ -17,13 +17,13 @@ import com.example.drunken_cat.utils.BusProvider;
 import java.util.ArrayList;
 
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.LocationViewHolder> {
-    Context context;
+
     ArrayList<Document> items;
     EditText editText;
     RecyclerView recyclerView;
 
-    public LocationAdapter(ArrayList<Document> items, Context context, EditText editText, RecyclerView recyclerView) {
-        this.context = context;
+    public LocationAdapter(ArrayList<Document> items, EditText editText, RecyclerView recyclerView) {
+
         this.items = items;
         this.editText = editText;
         this.recyclerView = recyclerView;
