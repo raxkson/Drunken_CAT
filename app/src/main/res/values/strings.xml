@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Drunken_CAT</string>
+    <string name="app_name">내가 취했던 그 날</string>
     <string name="restapi_key">KakaoAK 9aea00cde24b23164e167e7b215e426a</string>
 
     <string name="bottom_navi_text1">지도</string>

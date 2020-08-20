@@ -220,8 +220,6 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
         stopGoHomeFab.setOnClickListener(this);
         eraseMarker.setOnClickListener(this);
 
-        Toast.makeText(getActivity(), "맵을 로딩중입니다", Toast.LENGTH_SHORT).show();
-
         //맵 리스너 (현재위치 업데이트)
         mMapView.setCurrentLocationEventListener(this);
         //setCurrentLocationTrackingMode (지도랑 현재위치 좌표 찍어주고 따라다닌다.)
@@ -299,7 +297,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     }
 
     public void updateLocation() {
-        mmHandler.postDelayed(updateLocationtask, 5000);
+        mmHandler.postDelayed(updateLocationtask, 15000);
     }
 
 
@@ -559,8 +557,8 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
             Toast.makeText(getContext(), Double.toString(cur_distance), Toast.LENGTH_SHORT).show();
 
             if (cur_distance < 1) {//목적지 도착
-                NotificationSomethings("목적지 도착");
-                Toast.makeText(getContext(), "목적지 도착", Toast.LENGTH_SHORT).show();
+                NotificationSomethings("목적지에 도착하였습니다");
+                //Toast.makeText(getContext(), "목적지 도착", Toast.LENGTH_SHORT).show();
                 //isThread = false;
                 fileExists = storage.isFileExist(Filepath);
                 if (fileExists) {
@@ -573,24 +571,26 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 lm.removeUpdates(mLocationListener);
             }
             if (cur_distance > bef_distance + 0.005) {//SOS
-                NotificationSomethings("경로이탈");
-                Toast.makeText(getContext(), "경로이탈", Toast.LENGTH_SHORT).show();
+                NotificationSomethings("경로를 이탈하여 SMS를 전송합니다");
+                //Toast.makeText(getContext(), "경로이탈", Toast.LENGTH_SHORT).show();
 
                 Filepath = path + "Friend.txt";
                 fileExists = storage.isFileExist(Filepath);
                 if (fileExists) {
                     String content = storage.readTextFile(Filepath);
                     //name1☎phone1☎name2☎phone2☎name3☎phone3
+                    int length = 0;
                     String[] text = content.split("☎");
                     try {
                         SmsManager smsManager = SmsManager.getDefault();
-                        for (int i = 1; i < 6; i += 2) {
-                            smsManager.sendTextMessage(text[i], null, "다들 맛있는거 내가 다 쏜다!", null, null);
+                        length = text.length;
+                        for (int i = 1; i < length; i += 2) {
+                            smsManager.sendTextMessage(text[i], null, "지인이 경로를 이탈했습니다!", null, null);
                             Toast.makeText(getContext(), text[i], Toast.LENGTH_SHORT).show();
                         }
-                        Toast.makeText(getContext(), "SMS Send Success", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(),  Integer.toString(length/2) + "명의 지인에게 SMS를 전송하였습니다", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
-                        Toast.makeText(getContext(), "SMS Send failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), Integer.toString(length / 2) + "명의 지인에게 SMS를 전송하였습니다", Toast.LENGTH_SHORT).show();
                         System.out.println("Error");
                     }
                 } else {
@@ -601,8 +601,8 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
 
             tmp_distance = distanceInKilometerByHaversine(bef_latitude, bef_longitude, cur_latitude, cur_longitude);
             if (tmp_distance < 1 && bef_latitude != 2000 && bef_longitude != 2000) {//SOS
-                NotificationSomethings("움직임이 감지되지 않습니다");
-                Toast.makeText(getContext(), "움직임 없음", Toast.LENGTH_SHORT).show();
+                NotificationSomethings("움직임이 감지되지 않아 SMS를 전송합니다");
+                //Toast.makeText(getContext(), "움직임 없음", Toast.LENGTH_SHORT).show();
 
                 Filepath = path + "Friend.txt";
 
@@ -611,16 +611,18 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 if (fileExists) {
                     String content = storage.readTextFile(Filepath);
                     //name1☎phone1☎name2☎phone2☎name3☎phone3
+                    int length = 0;
                     String[] text = content.split("☎");
                     try {
                         SmsManager smsManager = SmsManager.getDefault();
-                        for (int i = 1; i < 6; i += 2) {
-                            smsManager.sendTextMessage(text[i], null, "다들 맛있는거 내가 다 쏜다!", null, null);
-                            Toast.makeText(getContext(), text[i], Toast.LENGTH_SHORT).show();
+                        length = text.length;
+                        for (int i = 1; i < length; i += 2) {
+                            smsManager.sendTextMessage(text[i], null, "지인의 움직임이 감지되지 않습니다", null, null);
+                            //Toast.makeText(getContext(), text[i], Toast.LENGTH_SHORT).show();
                         }
-                        Toast.makeText(getContext(), "SMS Send Success", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), Integer.toString(length/2) + "명의 지인에게 SMS를 전송하였습니다", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
-                        Toast.makeText(getContext(), "SMS Send failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), Integer.toString(length/2) + "명의 지인에게 SMS를 전송하였습니다", Toast.LENGTH_SHORT).show();
                         System.out.println("Error");
                     }
                 } else {
@@ -631,7 +633,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
             bef_distance = cur_distance;
             bef_latitude = cur_latitude;
             bef_longitude = cur_longitude;
-            mmHandler.postDelayed(this, 5000);
+            mmHandler.postDelayed(this, 15000);
         }
 
     };
