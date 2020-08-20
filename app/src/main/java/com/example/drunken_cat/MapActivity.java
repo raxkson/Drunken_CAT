@@ -1,15 +1,20 @@
 package com.example.drunken_cat;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -30,6 +35,7 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -75,6 +81,10 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
 
         //storage.setEncryptConfiguration(configuration);
 
+    //Notification
+    //Notification
+    public static final String NOTIFICATION_CHANNEL_ID = "11111";
+    private int count = 0;
 
     //xml
 
@@ -449,6 +459,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                     lm.removeUpdates(mLocationListener);
                 }
                 if(cur_distance > bef_distance + 0.005){//SOS
+                    NotificationSomethings("경로이탈");
                     Toast.makeText(getContext(), "경로이탈", Toast.LENGTH_SHORT).show();
 
                     Filepath = path + "Friend.txt";
@@ -1096,6 +1107,45 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
             mMapView.setShowCurrentLocationMarker(false);
         }
     }
+
+    //Notification
+    //Notification
+    public void NotificationSomethings(String content_msg) {
+
+        NotificationManager notificationManager = (NotificationManager)getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Intent notificationIntent = new Intent(getActivity(), NotificationActivity.class);
+        notificationIntent.putExtra("notificationId", count);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK) ;
+        PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0, notificationIntent,  PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), NOTIFICATION_CHANNEL_ID)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground)) //BitMap 이미지 요구
+                .setContentTitle("The Day I Drunk")
+                .setContentText(content_msg)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            builder.setSmallIcon(R.drawable.ic_launcher_foreground);
+            CharSequence CN  = "notification channel";
+
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, CN , importance);
+
+            assert notificationManager != null;
+            notificationManager.createNotificationChannel(channel);
+
+        }else builder.setSmallIcon(R.mipmap.ic_launcher);
+
+        assert notificationManager != null;
+        notificationManager.notify(10000, builder.build());
+    }
+
 /*    @Override
     public void finish() {
         getActivity().finish();

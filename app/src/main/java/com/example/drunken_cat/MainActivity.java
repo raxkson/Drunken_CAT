@@ -1,7 +1,13 @@
 package com.example.drunken_cat;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.Manifest;
@@ -11,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
@@ -21,6 +28,8 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
+
+
 
     //back button
     private BackButtonClick BackButtonClick;
@@ -60,11 +69,10 @@ public class MainActivity extends AppCompatActivity {
 
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.frameLayout, fragmentMap).commitAllowingStateLoss();
-        /*
-        transaction.add(R.id.frameLayout, fragmentFriend).commitAllowingStateLoss();
-        transaction.add(R.id.frameLayout, fragmentDriver).commitAllowingStateLoss();
-        transaction.add(R.id.frameLayout, fragmentRecord).commitAllowingStateLoss();*/
+
+
     }
+
 
     public void onBackPressed(){
         BackButtonClick.onBackPressed();
