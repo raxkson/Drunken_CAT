@@ -139,8 +139,22 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     double bef_distance = 100000000;
     double cur_distance;
     double tmp_distance;
+    boolean record_switch = false;
 
 
+
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    public void onCreate (Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -149,6 +163,9 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 .setEncryptContent(IVX, SECRET_KEY, SALT)
                 .build();
         view = inflater.inflate(R.layout.activity_map, container, false);
+        if(this.getArguments() != null){
+            record_switch = this.getArguments().getBoolean("recordSwitch"); // 전달한 key 값
+        }
 
         bus.register(this); //정류소 등록
         mSearchEdit = view.findViewById(R.id.map_et_search);
@@ -280,6 +297,10 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
 
     @Override
     public void onClick(View v) {
+
+        if(this.getArguments() != null){
+            record_switch = this.getArguments().getBoolean("recordSwitch"); // 전달한 key 값
+        }
         int id = v.getId();
         switch (id) {
             case R.id.fab:
@@ -326,7 +347,8 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 mLoaderLayout.setVisibility(View.GONE);
                 break;
             case R.id.gohome:
-
+                if(record_switch)
+                    getActivity().startService(new Intent(getActivity(), VoiceBackgroundActivity.class));
                 Storage storage = new Storage(getContext());
                 storage.setEncryptConfiguration(configuration);
                 String path = storage.getInternalFilesDirectory();
@@ -389,6 +411,8 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 break;
             case R.id.fab_stop_goHome:
                 //isThread = false;
+                if(record_switch)
+                    getActivity().stopService(new Intent(getActivity(), VoiceBackgroundActivity.class));// 추가
                 mmHandler.removeCallbacksAndMessages(null);
                 stopGoHomeFab.setVisibility(View.GONE);
                 FancyToast.makeText(getActivity(), "귀가 서비스 종료", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
@@ -483,7 +507,8 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                     NotificationSomethings("목적지 도착");
                     Toast.makeText(getContext(), "목적지 도착", Toast.LENGTH_SHORT).show();
                     //isThread = false;
-                    getActivity().stopService(new Intent(getActivity(),VoiceBackgroundActivity.class));
+                    if(record_switch)
+                        getActivity().stopService(new Intent(getActivity(),VoiceBackgroundActivity.class));
                     lm.removeUpdates(mLocationListener);
                 }
                 if(cur_distance > bef_distance + 0.005){//SOS

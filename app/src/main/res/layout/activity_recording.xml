@@ -27,9 +27,9 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="100dp"
+        android:layout_height="120dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="92dp"
+        android:layout_marginBottom="130dp"
         android:gravity="center">
 
         <LinearLayout
@@ -62,7 +62,9 @@
                 android:text="녹음시작" />
 -->
 
+
         </LinearLayout>
+
     </LinearLayout>
 
     <SeekBar
@@ -113,5 +115,25 @@
             android:layout_height="330dp"
             android:src="@drawable/ic_alogo"/>
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:background="@color/colorWhiteBlue"
+        android:layout_width="fill_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60sp"
+        android:gravity="center"
+        >
+        <com.github.angads25.toggle.widget.LabeledSwitch
+            android:id="@+id/recordOn"
+            android:textAlignment="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:textSize="14sp"/>
+        <!-- stuff inside layout -->
+    </LinearLayout>
+
 
 </RelativeLayout>

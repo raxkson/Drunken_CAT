@@ -1,10 +1,13 @@
 package com.example.drunken_cat;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
@@ -21,6 +24,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.github.angads25.toggle.interfaces.OnToggledListener;
+import com.github.angads25.toggle.model.ToggleableView;
+import com.github.angads25.toggle.widget.LabeledSwitch;
+
 public class RecordingActivity extends Fragment
         implements MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener {
 
@@ -33,12 +40,26 @@ public class RecordingActivity extends Fragment
     private Utilities utils;
     private View view;
     public String filename="";
+    public SharedPreferences appData;
+
+
+    public static void setDefaults(String key, Boolean value, Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(key, value);
+        editor.commit();
+    }
+
+    public static boolean getDefaults(String key, Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getBoolean(key, false);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         view = inflater.inflate(R.layout.activity_recording, container, false);
         permission();
-        media = MediaPlayer.create(getActivity(), Uri.parse("uriString"));;
+        media = MediaPlayer.create(getActivity(), Uri.parse("uriString"));
 
         File file = new File(getActivity().getFilesDir(),"record.mp4");
         filename = file.getAbsolutePath();
@@ -54,21 +75,19 @@ public class RecordingActivity extends Fragment
         progressBar.setOnSeekBarChangeListener(this);
         media.setOnCompletionListener(this);
 
-/*
-        // start
-        view.findViewById(R.id.record_start).setOnClickListener(new View.OnClickListener(){
-            public void onClick(View view){
-                getActivity().startService(new Intent(getActivity(), VoiceBackgroundActivity.class));//추가
+        if(!getDefaults("recordSwitch",getContext()))
+            setDefaults("recordSwitch", false, getContext());
+
+
+
+        LabeledSwitch labeledSwitch = view.findViewById(R.id.recordOn);
+        labeledSwitch.setOn(getDefaults("recordSwitch", getContext()));
+        labeledSwitch.setOnToggledListener(new OnToggledListener() {
+            @Override
+            public void onSwitched(ToggleableView toggleableView, boolean isOn) {
+                setDefaults("recordSwitch", isOn, getContext());
             }
         });
-        // stop
-        view.findViewById(R.id.record_stop).setOnClickListener(new View.OnClickListener(){
-            public void onClick(View view){
-                getActivity().stopService(new Intent(getActivity(), VoiceBackgroundActivity.class));// 추가
-                //stopRecord();
-            }
-        });
-*/
 
 
         Play.setOnClickListener(new View.OnClickListener() {

@@ -85,5 +85,9 @@ dependencies {
     //dialog
     implementation 'com.crowdfire.cfalertdialog:cfalertdialog:1.1.0'
 
+    //storage
     implementation 'com.snatik:storage:2.1.0'
+
+    //toggle
+    implementation 'com.github.angads25:toggle:1.1.0'
 }

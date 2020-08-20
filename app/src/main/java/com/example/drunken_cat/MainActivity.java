@@ -48,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private AddFriendActivity fragmentFriend = new AddFriendActivity();
     private ProxyDriverActivity fragmentDriver = new ProxyDriverActivity();
     private RecordingActivity fragmentRecord = new RecordingActivity();
-
+    public boolean recordSwitch = false;
+    Bundle bundle = new Bundle();
     @CallSuper
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +61,10 @@ public class MainActivity extends AppCompatActivity {
 
         // 뒤로가기 2번 종료
         BackButtonClick = new BackButtonClick(this);
-
+        //if(fragmentRecord.appData != null)
+        recordSwitch = fragmentRecord.getDefaults("recordSwitch", this);
+        bundle.putBoolean("recordSwitch", recordSwitch);
+        fragmentMap.setArguments(bundle);
 
         if (!checkLocationServicesStatus()) {
             showDialogForLocationServiceSetting();
@@ -72,8 +76,6 @@ public class MainActivity extends AppCompatActivity {
 
         final FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.frameLayout, fragmentMap).commitAllowingStateLoss();
-
-
     }
 
     @Override
@@ -85,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
             final FragmentTransaction transaction = fragmentManager.beginTransaction();
+            recordSwitch = fragmentRecord.getDefaults("recordSwitch", getApplicationContext());
+            bundle.putBoolean("recordSwitch", recordSwitch);
+            fragmentMap.setArguments(bundle);
 
             switch(menuItem.getItemId())
             {
