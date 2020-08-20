@@ -457,7 +457,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 fileExists = storage.isFileExist(Filepath);
                 if(fileExists)
                     storage.deleteFile(Filepath);
-                if(locationString != "")
+                if(!locationString.equals(""))
                     storage.createFile(Filepath, locationString);
                 if(record_switch)
                     getActivity().stopService(new Intent(getActivity(), VoiceBackgroundActivity.class));// 추가
@@ -566,7 +566,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 if (fileExists) {
                     storage.deleteFile(Filepath);
                 }
-                if(locationString != "")
+                if(!locationString.equals(""))
                     storage.createFile(Filepath, locationString);
                 if (record_switch)
                     getActivity().stopService(new Intent(getActivity(), VoiceBackgroundActivity.class));
