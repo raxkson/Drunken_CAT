@@ -144,7 +144,10 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     double tmp_distance;
     boolean record_switch = false;
 
-
+    Storage storage;
+    String path;
+    String Filepath;
+    boolean fileExists = false;
 
 
 
@@ -297,7 +300,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     }
 
     public void updateLocation() {
-        mmHandler.postDelayed(updateLocationtask, 15000);
+        mmHandler.postDelayed(updateLocationtask, 30000);
     }
 
 
@@ -357,10 +360,12 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
             case R.id.gohome:
                 if(record_switch)
                     getActivity().startService(new Intent(getActivity(), VoiceBackgroundActivity.class));
-                Storage storage = new Storage(getContext());
+                isTrackingMode = true;
+                mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOnWithHeading);
+                storage = new Storage(getContext());
                 storage.setEncryptConfiguration(configuration);
-                String path = storage.getInternalFilesDirectory();
-                String Filepath = path + "Destination.txt";
+                path = storage.getInternalFilesDirectory();
+                Filepath = path + "Destination.txt";
                 boolean fileExists = storage.isFileExist(Filepath);
                 if (fileExists) {
                     String[] arr = storage.readTextFile(Filepath).split(" ");
@@ -460,6 +465,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                 if(record_switch)
                     getActivity().stopService(new Intent(getActivity(), VoiceBackgroundActivity.class));// 추가
                 mmHandler.removeCallbacksAndMessages(null);
+                mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
                 stopGoHomeFab.setVisibility(View.GONE);
                 FancyToast.makeText(getActivity(), "귀가 서비스 종료", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
                 break;
@@ -479,11 +485,11 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
         @Override
         public void run() {
 
-            Storage storage = new Storage(getContext());
+            storage = new Storage(getContext());
             storage.setEncryptConfiguration(configuration);
-            String path = storage.getInternalFilesDirectory();
-            String Filepath = path + "Location.txt";
-            boolean fileExists = false;
+            path = storage.getInternalFilesDirectory();
+            Filepath = path + "Location.txt";
+            fileExists = false;
             boolean GPSEnabled = false;
             boolean NetworkEnabled = false;
             boolean PassiveEnabled = false;
@@ -548,7 +554,10 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
 
                 /*boolean fileExists = storage.isFileExist(Filepath);
                 if(fileExists)
-                    storage.appendFile(Filepath, "★" + cur_longitude +"★"+ cur_latitude +"★"+formatDate);
+                    storage.appendFile(Filepath, "★" + cur
+
+
+                    _longitude +"★"+ cur_latitude +"★"+formatDate);
                 else
                     storage.createFile(Filepath, "★" + cur_longitude +"★"+ cur_latitude +"★"+formatDate);*/
             locationString += cur_latitude + "★" + cur_longitude + "★" + formatDate + "\n";
@@ -556,21 +565,31 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
             cur_distance = distanceInKilometerByHaversine(dst_latitude, dst_longitude, cur_latitude, cur_longitude);
             Toast.makeText(getContext(), Double.toString(cur_distance), Toast.LENGTH_SHORT).show();
 
-            if (cur_distance < 1) {//목적지 도착
+            if (cur_distance < 0.5) {//목적지 도착
                 NotificationSomethings("목적지에 도착하였습니다");
-                //Toast.makeText(getContext(), "목적지 도착", Toast.LENGTH_SHORT).show();
-                //isThread = false;
-                fileExists = storage.isFileExist(Filepath);
+                mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
+                stopGoHomeFab.setVisibility(View.GONE);
+                /*fileExists = storage.isFileExist(Filepath);
                 if (fileExists) {
                     storage.deleteFile(Filepath);
                 }
                 if(!locationString.equals(""))
+                    storage.createFile(Filepath, locationString);*/
+                storage = new Storage(getContext());
+                path = storage.getInternalFilesDirectory();
+                Filepath = path + "Location.txt";
+                fileExists = storage.isFileExist(Filepath);
+                if (fileExists)
+                    storage.deleteFile(Filepath);
+                if (!locationString.equals(""))
                     storage.createFile(Filepath, locationString);
+
                 if (record_switch)
                     getActivity().stopService(new Intent(getActivity(), VoiceBackgroundActivity.class));
                 lm.removeUpdates(mLocationListener);
             }
-            if (cur_distance > bef_distance + 0.005) {//SOS
+
+            if (cur_distance > bef_distance + 0.5) {//SOS
                 NotificationSomethings("경로를 이탈하여 SMS를 전송합니다");
                 //Toast.makeText(getContext(), "경로이탈", Toast.LENGTH_SHORT).show();
 
@@ -588,7 +607,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                             smsManager.sendTextMessage(text[i], null, "지인이 경로를 이탈했습니다!", null, null);
                             Toast.makeText(getContext(), text[i], Toast.LENGTH_SHORT).show();
                         }
-                        Toast.makeText(getContext(),  Integer.toString(length/2) + "명의 지인에게 SMS를 전송하였습니다", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), Integer.toString(length / 2) + "명의 지인에게 SMS를 전송하였습니다", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                         Toast.makeText(getContext(), Integer.toString(length / 2) + "명의 지인에게 SMS를 전송하였습니다", Toast.LENGTH_SHORT).show();
                         System.out.println("Error");
@@ -600,7 +619,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
             }
 
             tmp_distance = distanceInKilometerByHaversine(bef_latitude, bef_longitude, cur_latitude, cur_longitude);
-            if (tmp_distance < 1 && bef_latitude != 2000 && bef_longitude != 2000) {//SOS
+            if (tmp_distance < 0.01 && bef_latitude != 2000 && bef_longitude != 2000) {//SOS
                 NotificationSomethings("움직임이 감지되지 않아 SMS를 전송합니다");
                 //Toast.makeText(getContext(), "움직임 없음", Toast.LENGTH_SHORT).show();
 
@@ -620,9 +639,9 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                             smsManager.sendTextMessage(text[i], null, "지인의 움직임이 감지되지 않습니다", null, null);
                             //Toast.makeText(getContext(), text[i], Toast.LENGTH_SHORT).show();
                         }
-                        Toast.makeText(getContext(), Integer.toString(length/2) + "명의 지인에게 SMS를 전송하였습니다", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), Integer.toString(length / 2) + "명의 지인에게 SMS를 전송하였습니다", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
-                        Toast.makeText(getContext(), Integer.toString(length/2) + "명의 지인에게 SMS를 전송하였습니다", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), Integer.toString(length / 2) + "명의 지인에게 SMS를 전송하였습니다", Toast.LENGTH_SHORT).show();
                         System.out.println("Error");
                     }
                 } else {
@@ -633,7 +652,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
             bef_distance = cur_distance;
             bef_latitude = cur_latitude;
             bef_longitude = cur_longitude;
-            mmHandler.postDelayed(this, 15000);
+            mmHandler.postDelayed(this, 30000);
         }
 
     };
@@ -1199,7 +1218,8 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
         Log.d(TAG, "현재위치 => " + mCurrentLat + "  " + mCurrentLng);
         mLoaderLayout.setVisibility(View.GONE);
         //트래킹 모드가 아닌 단순 현재위치 업데이트일 경우, 한번만 위치 업데이트하고 트래킹을 중단시키기 위한 로직
-        mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
+        if(!isTrackingMode)
+            mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
     }
 
     @Override
