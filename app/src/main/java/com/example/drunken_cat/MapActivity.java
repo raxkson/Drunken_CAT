@@ -132,12 +132,15 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
 
     Thread thread;
     boolean isThread = false;
+    double bef_longitude = 2000;
+    double bef_latitude = 2000;
     double cur_longitude = 1000;
     double cur_latitude = 1000;
     double dst_longitude = 126.644383;
     double dst_latitude = 37.386208;
     double bef_distance = 100000000;
     double cur_distance = 0;
+    double tmp_distance = 0;
 
 
     @Override
@@ -453,6 +456,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                 cur_distance = distanceInKilometerByHaversine(dst_latitude, dst_longitude, cur_latitude, cur_longitude);
                 Toast.makeText(getContext(), Double.toString(cur_distance), Toast.LENGTH_SHORT).show();
                 if(cur_distance < 1){//목적지 도착
+                    NotificationSomethings("목적지 도착");
                     Toast.makeText(getContext(), "목적지 도착", Toast.LENGTH_SHORT).show();
                     isThread = false;
                     getActivity().stopService(new Intent(getActivity(),VoiceBackgroundActivity.class));
@@ -486,8 +490,39 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                     }
 
                 }
-                bef_distance = cur_distance;
 
+            tmp_distance = distanceInKilometerByHaversine(bef_latitude, bef_longitude, cur_latitude, cur_longitude);
+            if(tmp_distance < 1 && bef_latitude != 2000 && bef_longitude != 2000){//SOS
+                    NotificationSomethings("움직임이 감지되지 않습니다");
+                    Toast.makeText(getContext(), "움직임 없음", Toast.LENGTH_SHORT).show();
+
+                    Filepath = path + "Friend.txt";
+
+
+                    fileExists = storage.isFileExist(Filepath);
+                    if(fileExists){
+                        String content = storage.readTextFile(Filepath);
+                        //name1☎phone1☎name2☎phone2☎name3☎phone3
+                        String[] text = content.split("☎");
+                        try{
+                            SmsManager smsManager = SmsManager.getDefault();
+                            for(int i = 1; i < 6; i+=2){
+                                smsManager.sendTextMessage(text[i], null, "다들 맛있는거 내가 다 쏜다!", null, null);
+                                Toast.makeText(getContext(), text[i], Toast.LENGTH_SHORT).show();
+                            }
+                            Toast.makeText(getContext(), "SMS Send Success", Toast.LENGTH_SHORT).show();
+                        } catch(Exception e){
+                            Toast.makeText(getContext(), "SMS Send failed", Toast.LENGTH_SHORT).show();
+                            e.printStackTrace();
+                        }
+                    }else{
+                        FancyToast.makeText(getContext(), "지인 등록이 되어있지 않습니다. 지인을 등록해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
+                    }
+
+            }
+                bef_distance = cur_distance;
+                bef_latitude = cur_latitude;
+                bef_longitude = cur_longitude;
             }
 
     };
