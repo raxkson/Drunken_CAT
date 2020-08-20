@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -88,11 +89,9 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     //xml
 
     String IVX = "abcdefghijklmnop"; // 16 lenght - not secret
-    String SECRET_KEY = "secret1234567890"; // 16 lenght - secret
+    String SECRET_KEY;
     byte[] SALT = "0000111100001111".getBytes(); // random 16 bytes array
-    EncryptConfiguration configuration = new EncryptConfiguration.Builder()
-            .setEncryptContent(IVX, SECRET_KEY, SALT)
-            .build();
+    EncryptConfiguration configuration;
     MapView mMapView;
     ViewGroup mMapViewContainer;
     EditText mSearchEdit;
@@ -142,8 +141,13 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
     double tmp_distance;
 
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        SECRET_KEY = android.provider.Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        configuration = new EncryptConfiguration.Builder()
+                .setEncryptContent(IVX, SECRET_KEY, SALT)
+                .build();
         view = inflater.inflate(R.layout.activity_map, container, false);
 
         bus.register(this); //정류소 등록

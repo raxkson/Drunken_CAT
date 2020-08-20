@@ -1,7 +1,13 @@
 package com.example.drunken_cat;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,16 +16,19 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.snatik.storage.EncryptConfiguration;
 import com.snatik.storage.Storage;
 
+
 public class AddFriendActivity extends Fragment {
 
 
     EditText friend_name_1, friend_phone_1, friend_name_2, friend_phone_2, friend_name_3, friend_phone_3;
-
     Button btn_register_friend;
 
 
@@ -41,7 +50,8 @@ public class AddFriendActivity extends Fragment {
 
         //encrypt and decrypt file
         final String IVX = "abcdefghijklmnop"; // 16 lenght - not secret
-        final String SECRET_KEY = "secret1234567890"; // 16 lenght - secret
+        final String SECRET_KEY = android.provider.Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+
         final byte[] SALT = "0000111100001111".getBytes(); // random 16 bytes array
         final EncryptConfiguration configuration = new EncryptConfiguration.Builder()
                 .setEncryptContent(IVX, SECRET_KEY, SALT)
