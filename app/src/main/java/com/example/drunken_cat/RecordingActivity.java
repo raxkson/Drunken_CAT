@@ -1,29 +1,17 @@
 package com.example.drunken_cat;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
-import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.ImageButton;
@@ -112,7 +100,7 @@ public class RecordingActivity extends Fragment
                 media.setDataSource(filename);
                 media.prepare();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Error");
             }
         }
         media.start();
@@ -131,6 +119,7 @@ public class RecordingActivity extends Fragment
     }
 
     private Runnable mUpdateTimeTask = new Runnable() {
+        @Override
         public void run() {
             long totalDuration = media.getDuration();
             long currentDuration = media.getCurrentPosition();

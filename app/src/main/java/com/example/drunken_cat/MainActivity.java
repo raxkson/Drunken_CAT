@@ -15,6 +15,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -38,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     //location permission
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
-    private static final int SEND_SMS = 1001;
+    //private static final int SEND_SMS = 1001;
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS};
 
     private FragmentManager fragmentManager = getSupportFragmentManager();
@@ -47,9 +49,10 @@ public class MainActivity extends AppCompatActivity {
     private ProxyDriverActivity fragmentDriver = new ProxyDriverActivity();
     private RecordingActivity fragmentRecord = new RecordingActivity();
 
+    @CallSuper
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Intent intent = new Intent(this, SplashActivity.class);
+        final Intent intent = new Intent(this, SplashActivity.class);
         startActivity(intent);
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -64,23 +67,24 @@ public class MainActivity extends AppCompatActivity {
         }else {
             checkRunTimePermission();
         }
-        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.main_bottom_navigation);
+        final BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.main_bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(new ItemSelectedListener());
 
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        final FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.frameLayout, fragmentMap).commitAllowingStateLoss();
 
 
     }
 
-
+    @Override
     public void onBackPressed(){
         BackButtonClick.onBackPressed();
     }
+
     class ItemSelectedListener implements BottomNavigationView.OnNavigationItemSelectedListener{
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            final FragmentTransaction transaction = fragmentManager.beginTransaction();
 
             switch(menuItem.getItemId())
             {
@@ -105,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
                     transaction.remove(fragmentDriver).commitNow();
                     transaction.add(R.id.frameLayout, fragmentRecord, "Recording").commitNow();
                     break;
+                default:
+                    break;
             }
             return true;
         }
@@ -121,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
             boolean check_result = true;
 
-            for (int result : grandResults) {
+            for (final int result : grandResults) {
                 if (result != PackageManager.PERMISSION_GRANTED) {
                     check_result = false;
                     break;
@@ -144,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
     void checkRunTimePermission(){
         //런타임 퍼미션 처리
         // 1. 위치 퍼미션을 가지고 있는지 체크합니다.
-        int hasFineSmsPermission = ContextCompat.checkSelfPermission(this,
+        final int hasFineSmsPermission = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.SEND_SMS);
 
         int hasFineLocationPermission = ContextCompat.checkSelfPermission(this,
@@ -203,6 +209,8 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                 }
+                break;
+            default:
                 break;
         }
     }

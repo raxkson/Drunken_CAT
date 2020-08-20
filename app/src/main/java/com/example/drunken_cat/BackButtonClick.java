@@ -4,14 +4,13 @@ import android.app.Activity;
 import android.widget.Toast;
 
 public class BackButtonClick {
-    private long backKeyPressedTime = 0;
+    private long backKeyPressedTime;
     private Toast toast;
 
     private Activity activity;
 
     public BackButtonClick(Activity context){
         this.activity=context;
-
     }
 
     public void onBackPressed(){

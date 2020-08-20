@@ -8,7 +8,7 @@ public class ApiClient {
     private static final String BASE_URL = "https://dapi.kakao.com/";
     private static Retrofit retrofit;
 
-    public static Retrofit getApiClient(){
+    public static synchronized Retrofit getApiClient(){
         if(retrofit == null){
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)

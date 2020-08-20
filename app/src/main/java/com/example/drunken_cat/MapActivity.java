@@ -27,11 +27,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -84,7 +81,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
     //Notification
     //Notification
     public static final String NOTIFICATION_CHANNEL_ID = "11111";
-    private int count = 0;
+    private int count;
 
     //xml
 
@@ -102,7 +99,6 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
     private FloatingActionButton fab, fab1, fab2, fab3, searchDetailFab, stopTrackingFab, goHome, stopGoHomeFab;
     RelativeLayout mLoaderLayout;
     RecyclerView recyclerView;
-
     //value
     MapPoint currentMapPoint;
     private double mCurrentLng; //Long = X, Lat = Yㅌ
@@ -110,7 +106,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
     private double mSearchLng = -1;
     private double mSearchLat = -1;
     private String mSearchName;
-    boolean isTrackingMode = false; //트래킹 모드인지 (3번째 버튼 현재위치 추적 눌렀을 경우 true되고 stop 버튼 누르면 false로 된다)
+    boolean isTrackingMode; //트래킹 모드인지 (3번째 버튼 현재위치 추적 눌렀을 경우 true되고 stop 버튼 누르면 false로 된다)
     Bus bus = BusProvider.getInstance();
 
     ArrayList<Document> bigMartList = new ArrayList<>(); //대형마트 MT1
@@ -130,8 +126,9 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
     private InputMethodManager imm;
     private View view;
 
-    Thread thread;
-    boolean isThread = false;
+    //Thread thread;
+    //private boolean isThread;
+    private Handler mmHandler = new Handler();
     double bef_longitude = 2000;
     double bef_latitude = 2000;
     double cur_longitude = 1000;
@@ -139,8 +136,8 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
     double dst_longitude = 126.644383;
     double dst_latitude = 37.386208;
     double bef_distance = 100000000;
-    double cur_distance = 0;
-    double tmp_distance = 0;
+    double cur_distance;
+    double tmp_distance;
 
 
     @Override
@@ -270,6 +267,10 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
         });
     }
 
+    public void updateLocation(){
+        mmHandler.postDelayed(updateLocationtask, 5000);
+    }
+
 
 
     @Override
@@ -331,7 +332,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                     dst_latitude = Double.parseDouble(arr[0]);
                     dst_longitude = Double.parseDouble(arr[1]);
 
-                    isThread = true;
+                    //isThread = true;
                     //switch on off
                     searchDetailFab.setVisibility(View.GONE);
                     mLoaderLayout.setVisibility(View.VISIBLE);
@@ -340,20 +341,22 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                     stopGoHomeFab.setVisibility(View.VISIBLE);
                     mLoaderLayout.setVisibility(View.GONE);
 
-
+                    updateLocation();
+                /*
                     thread =  new Thread(){
+                        @Override
                         public void run(){
                             while(isThread){
                                 try {
                                     sleep(10000);
                                 } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                    System.out.println("Error");
                                 }
                                 handler.sendEmptyMessage(1);
                             }
                         }
                     };
-                    thread.start();
+                    thread.start();*/
                 }else{
                     FancyToast.makeText(getActivity(), "목적지를 등록해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
                 }
@@ -381,17 +384,20 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                 FancyToast.makeText(getActivity(), "현재위치 추적 종료", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
                 break;
             case R.id.fab_stop_goHome:
-                isThread = false;
-                handler.removeCallbacksAndMessages(null);
+                //isThread = false;
+                mmHandler.removeCallbacksAndMessages(null);
                 stopGoHomeFab.setVisibility(View.GONE);
                 FancyToast.makeText(getActivity(), "귀가 서비스 종료", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
+            default:
+                break;
         }
     }
 
 
-    private Handler handler = new Handler(){
+    private Runnable updateLocationtask = new Runnable() {
         @Override
-        public void handleMessage(Message msg) {
+        public void run() {
+
             Storage storage = new Storage(getContext());
             storage.setEncryptConfiguration(configuration);
             String path = storage.getInternalFilesDirectory();
@@ -470,7 +476,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                 if(cur_distance < 1){//목적지 도착
                     NotificationSomethings("목적지 도착");
                     Toast.makeText(getContext(), "목적지 도착", Toast.LENGTH_SHORT).show();
-                    isThread = false;
+                    //isThread = false;
                     getActivity().stopService(new Intent(getActivity(),VoiceBackgroundActivity.class));
                     lm.removeUpdates(mLocationListener);
                 }
@@ -495,7 +501,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                             Toast.makeText(getContext(), "SMS Send Success", Toast.LENGTH_SHORT).show();
                         } catch(Exception e){
                             Toast.makeText(getContext(), "SMS Send failed", Toast.LENGTH_SHORT).show();
-                            e.printStackTrace();
+                            System.out.println("Error");
                         }
                     }else{
                         FancyToast.makeText(getContext(), "지인 등록이 되어있지 않습니다. 지인을 등록해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
@@ -525,17 +531,18 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                             Toast.makeText(getContext(), "SMS Send Success", Toast.LENGTH_SHORT).show();
                         } catch(Exception e){
                             Toast.makeText(getContext(), "SMS Send failed", Toast.LENGTH_SHORT).show();
-                            e.printStackTrace();
+                            System.out.println("Error");
                         }
                     }else{
                         FancyToast.makeText(getContext(), "지인 등록이 되어있지 않습니다. 지인을 등록해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
                     }
 
             }
-                bef_distance = cur_distance;
-                bef_latitude = cur_latitude;
-                bef_longitude = cur_longitude;
-            }
+            bef_distance = cur_distance;
+            bef_latitude = cur_latitude;
+            bef_longitude = cur_longitude;
+            mmHandler.postDelayed(this, 5000);
+        }
 
     };
 
@@ -545,9 +552,6 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
             cur_longitude = location.getLongitude();//height
             cur_latitude = location.getLatitude();//width
 
-            double altitude = location.getAltitude();
-            float accuracy = location.getAccuracy();
-            String provider = location.getProvider();
         }
         @Override
         public void onStatusChanged(String s, int i, Bundle bundle) {
@@ -1145,10 +1149,10 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
     public void onDestroyView(){
         super.onDestroyView();
         bus.unregister(this);
-        if(isThread){
+        /*if(isThread){
             FancyToast.makeText(getActivity(), "페이지 이동 시 귀가 서비스가 종료됩니다.", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
             //thread.getth
-        }
+        }*/
         if (isTrackingMode) {
             mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
             mMapView.setShowCurrentLocationMarker(false);

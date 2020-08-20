@@ -24,8 +24,7 @@ public class MapSearchDetailActivity extends AppCompatActivity {
 
     //xml
     RadarChart radarChart;
-    TextView itemCntText1, itemCntText2, itemCntText3, itemCntText4, itemCntText5, itemCntText6, itemCntText7, itemCntText8, itemCntText9;
-    TextView ratingScore;
+    TextView itemCntText1, itemCntText2, itemCntText3, itemCntText4, itemCntText5, itemCntText6, itemCntText7, itemCntText8, itemCntText9, ratingScore;
     RatingBar ratingBar;
 
     //value
