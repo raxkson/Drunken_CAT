@@ -336,12 +336,11 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                     String[] arr = storage.readTextFile(Filepath).split(" ");
                     dst_latitude = Double.parseDouble(arr[0]);
                     dst_longitude = Double.parseDouble(arr[1]);
-
                     //isThread = true;
                     //switch on off
                     searchDetailFab.setVisibility(View.GONE);
                     mLoaderLayout.setVisibility(View.VISIBLE);
-                    FancyToast.makeText(getActivity(), "안전 귀가 서비스가 정상 작동합니다.", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
+                    FancyToast.makeText(getActivity(), arr[2] + "로 안전 귀가 서비스가 정상 작동합니다.", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
                     anim();
                     stopGoHomeFab.setVisibility(View.VISIBLE);
                     mLoaderLayout.setVisibility(View.GONE);
@@ -1058,7 +1057,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
                     storage.setEncryptConfiguration(configuration);
                     String path = storage.getInternalFilesDirectory();
                     String Filepath = path + "Destination.txt";
-                    String dest = lat + " " + lng;
+                    String dest = lat + " " + lng + " " + mapPOIItem.getItemName();
                     boolean fileExists = storage.isFileExist(Filepath);
                     if(fileExists){
                         storage.deleteFile(Filepath);
