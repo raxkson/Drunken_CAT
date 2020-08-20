@@ -1,6 +1,7 @@
 package com.example.drunken_cat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -477,6 +478,7 @@ public class MapActivity extends Fragment implements MapView.MapViewEventListene
 
 
     private final Runnable updateLocationtask = new Runnable() {
+        @SuppressLint("MissingPermission")
         @Override
         public void run() {
 
