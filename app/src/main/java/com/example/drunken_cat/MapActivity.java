@@ -99,7 +99,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
     EditText mSearchEdit;
     private Animation fab_open, fab_close;
     private Boolean isFabOpen = false;
-    private FloatingActionButton fab, fab1, fab2, fab3, searchDetailFab, stopTrackingFab, goHome;
+    private FloatingActionButton fab, fab1, fab2, fab3, searchDetailFab, stopTrackingFab, goHome, stopGoHomeFab;
     RelativeLayout mLoaderLayout;
     RecyclerView recyclerView;
 
@@ -158,6 +158,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
         goHome = view.findViewById(R.id.gohome);
         searchDetailFab = view.findViewById(R.id.fab_detail);
         stopTrackingFab = view.findViewById(R.id.fab_stop_tracking);
+        stopGoHomeFab = view.findViewById(R.id.fab_stop_goHome);
         mLoaderLayout = view.findViewById(R.id.loaderLayout);
         mMapView = new MapView(getActivity());
         mMapViewContainer = view.findViewById(R.id.map_mv_mapcontainer);
@@ -189,6 +190,7 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
         goHome.setOnClickListener(this);
         searchDetailFab.setOnClickListener(this);
         stopTrackingFab.setOnClickListener(this);
+        stopGoHomeFab.setOnClickListener(this);
 
         Toast.makeText(getActivity(), "맵을 로딩중입니다", Toast.LENGTH_SHORT).show();
 
@@ -331,18 +333,23 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
 
                     isThread = true;
                     //switch on off
-
-
+                    searchDetailFab.setVisibility(View.GONE);
+                    mLoaderLayout.setVisibility(View.VISIBLE);
                     FancyToast.makeText(getActivity(), "안전 귀가 서비스가 정상 작동합니다.", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
+                    anim();
+                    stopGoHomeFab.setVisibility(View.VISIBLE);
+                    mLoaderLayout.setVisibility(View.GONE);
+
+
                     thread =  new Thread(){
                         public void run(){
                             while(isThread){
                                 try {
-                                    sleep(5000);
+                                    sleep(10000);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
-                                handler.sendEmptyMessage(0);
+                                handler.sendEmptyMessage(1);
                             }
                         }
                     };
@@ -373,13 +380,18 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                 stopTrackingFab.setVisibility(View.GONE);
                 FancyToast.makeText(getActivity(), "현재위치 추적 종료", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
                 break;
+            case R.id.fab_stop_goHome:
+                isThread = false;
+                handler.removeCallbacksAndMessages(null);
+                stopGoHomeFab.setVisibility(View.GONE);
+                FancyToast.makeText(getActivity(), "귀가 서비스 종료", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
         }
     }
 
 
     private Handler handler = new Handler(){
         @Override
-        public void handleMessage(@NonNull Message msg) {
+        public void handleMessage(Message msg) {
             Storage storage = new Storage(getContext());
             storage.setEncryptConfiguration(configuration);
             String path = storage.getInternalFilesDirectory();
