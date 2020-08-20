@@ -1,13 +1,18 @@
 package com.example.drunken_cat;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.IBinder;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,4 +74,5 @@ public class VoiceBackgroundActivity extends Service {
     public boolean onUnbind(Intent intent){
         return super.onUnbind(intent);
     }
+
 }

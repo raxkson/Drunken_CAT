@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -37,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private MapActivity fragmentMap = new MapActivity();
     private AddFriendActivity fragmentFriend = new AddFriendActivity();
     private ProxyDriverActivity fragmentDriver = new ProxyDriverActivity();
-    private recordingActivity fragmentRecord = new recordingActivity();
+    private RecordingActivity fragmentRecord = new RecordingActivity();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
