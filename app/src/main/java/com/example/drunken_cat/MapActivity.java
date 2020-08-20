@@ -22,8 +22,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -43,6 +46,7 @@ import com.example.drunken_cat.utils.BusProvider;
 import com.example.drunken_cat.utils.IntentKey;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.shashank.sony.fancytoastlib.FancyToast;
+import com.snatik.storage.EncryptConfiguration;
 import com.snatik.storage.Storage;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -73,6 +77,13 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
 
 
     //xml
+
+    String IVX = "abcdefghijklmnop"; // 16 lenght - not secret
+    String SECRET_KEY = "secret1234567890"; // 16 lenght - secret
+    byte[] SALT = "0000111100001111".getBytes(); // random 16 bytes array
+    EncryptConfiguration configuration = new EncryptConfiguration.Builder()
+            .setEncryptContent(IVX, SECRET_KEY, SALT)
+            .build();
     MapView mMapView;
     ViewGroup mMapViewContainer;
     EditText mSearchEdit;
@@ -118,10 +129,10 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
     double bef_distance = 100000000;
     double cur_distance = 0;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
        view = inflater.inflate(R.layout.activity_map, container, false);
-
 
         bus.register(this); //정류소 등록
         mSearchEdit = view.findViewById(R.id.map_et_search);
@@ -296,28 +307,36 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
             case R.id.gohome:
 
                 Storage storage = new Storage(getContext());
+                storage.setEncryptConfiguration(configuration);
                 String path = storage.getInternalFilesDirectory();
                 String Filepath = path + "Destination.txt";
+                boolean fileExists = storage.isFileExist(Filepath);
+                if(fileExists){
+                    String[] arr = storage.readTextFile(Filepath).split(" ");
+                    dst_latitude = Double.parseDouble(arr[0]);
+                    dst_longitude = Double.parseDouble(arr[1]);
 
-                String[] arr = storage.readTextFile(Filepath).split(" ");
-                dst_latitude = Double.parseDouble(arr[0]);
-                dst_longitude = Double.parseDouble(arr[1]);
-                System.out.println("hello" + arr[0] + ", " + arr[1]);
+                    isThread = true;
+                    //switch on off
 
-                isThread = true;
-                thread =  new Thread(){
-                    public void run(){
-                        while(isThread){
-                            try {
-                                sleep(5000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
+
+                    FancyToast.makeText(getActivity(), "안전 귀가 서비스가 정상 작동합니다.", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
+                    thread =  new Thread(){
+                        public void run(){
+                            while(isThread){
+                                try {
+                                    sleep(5000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                handler.sendEmptyMessage(0);
                             }
-                            handler.sendEmptyMessage(0);
                         }
-                    }
-                };
-                thread.start();
+                    };
+                    thread.start();
+                }else{
+                    FancyToast.makeText(getActivity(), "목적지를 등록해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
+                }
                 break;
             case R.id.fab_detail:
                 FancyToast.makeText(getActivity(), "검색결과 상세보기", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
@@ -349,9 +368,9 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
         @Override
         public void handleMessage(@NonNull Message msg) {
             Storage storage = new Storage(getContext());
+            storage.setEncryptConfiguration(configuration);
             String path = storage.getInternalFilesDirectory();
             String Filepath = path + "Location.txt";
-
 
             final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
             boolean GPSEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -371,10 +390,11 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                             0,
                             mLocationListener);
                     if(lm != null){
-                        location = lm.getLastKnownLocation(lm.GPS_PROVIDER);
+                        location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                         if(location != null){
                             cur_longitude = location.getLongitude();
                             cur_latitude = location.getLatitude();
+                            Toast.makeText(getContext(), "GPS", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -386,10 +406,11 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                                 0,
                                 mLocationListener);
                         if(lm != null) {
-                            location = lm.getLastKnownLocation(lm.NETWORK_PROVIDER);
+                            location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                             if (location != null) {
                                 cur_longitude = location.getLongitude();
                                 cur_latitude = location.getLatitude();
+                                Toast.makeText(getContext(), "NET", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
@@ -402,10 +423,11 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                                 0,
                                 mLocationListener);
                         if(lm != null) {
-                            location = lm.getLastKnownLocation(lm.PASSIVE_PROVIDER);
+                            location = lm.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
                             if (location != null) {
                                 cur_longitude = location.getLongitude();
                                 cur_latitude = location.getLatitude();
+                                Toast.makeText(getContext(), "PASSIVE", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
@@ -423,32 +445,37 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                 if(cur_distance < 1){//목적지 도착
                     Toast.makeText(getContext(), "목적지 도착", Toast.LENGTH_SHORT).show();
                     isThread = false;
-
+                    getActivity().stopService(new Intent(getActivity(),VoiceBackgroundActivity.class));
+                    lm.removeUpdates(mLocationListener);
                 }
                 if(cur_distance > bef_distance + 0.005){//SOS
                     Toast.makeText(getContext(), "경로이탈", Toast.LENGTH_SHORT).show();
 
                     Filepath = path + "Friend.txt";
 
-                    String content = storage.readTextFile(Filepath);
-                    //name1☎phone1☎name2☎phone2☎name3☎phone3
-                    String[] text = content.split("☎");
 
-
-                    try{
-                        SmsManager smsManager = SmsManager.getDefault();
-                        for(int i = 1; i < 6; i+=2){
-                            smsManager.sendTextMessage(text[i], null, "다들 맛있는거 내가 다 쏜다!", null, null);
+                    fileExists = storage.isFileExist(Filepath);
+                    if(fileExists){
+                        String content = storage.readTextFile(Filepath);
+                        //name1☎phone1☎name2☎phone2☎name3☎phone3
+                        String[] text = content.split("☎");
+                        try{
+                            SmsManager smsManager = SmsManager.getDefault();
+                            for(int i = 1; i < 6; i+=2){
+                                smsManager.sendTextMessage(text[i], null, "다들 맛있는거 내가 다 쏜다!", null, null);
+                                Toast.makeText(getContext(), text[i], Toast.LENGTH_SHORT).show();
+                            }
+                            Toast.makeText(getContext(), "SMS Send Success", Toast.LENGTH_SHORT).show();
+                        } catch(Exception e){
+                            Toast.makeText(getContext(), "SMS Send failed", Toast.LENGTH_SHORT).show();
+                            e.printStackTrace();
                         }
-                        Toast.makeText(getContext(), "SMS Send Success", Toast.LENGTH_SHORT).show();
-                    } catch(Exception e){
-                        Toast.makeText(getContext(), "SMS Send failed", Toast.LENGTH_SHORT).show();
-                        e.printStackTrace();
+                    }else{
+                        FancyToast.makeText(getContext(), "지인 등록이 되어있지 않습니다. 지인을 등록해주세요", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
                     }
 
                 }
                 bef_distance = cur_distance;
-                lm.removeUpdates(mLocationListener);
 
             }
 
@@ -952,13 +979,14 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
                 } else if (index == 1) {
                     showMap(Uri.parse("daummaps://route?sp=" + mCurrentLat + "," + mCurrentLng + "&ep=" + lat + "," + lng + "&by=FOOT"));
                 } else if (index == 2) {
-                    FancyToast.makeText(getActivity(), "목적지가 등록되었습니다.", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
+                    FancyToast.makeText(getActivity(), "목적지가 등록되었습니다.", FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, true).show();
                     mLoaderLayout.setVisibility(View.GONE);
                     dialogInterface.dismiss();
 
                     //create destination file
 
                     Storage storage = new Storage(getContext());
+                    storage.setEncryptConfiguration(configuration);
                     String path = storage.getInternalFilesDirectory();
                     String Filepath = path + "Destination.txt";
                     String dest = lat + " " + lng;
@@ -1059,6 +1087,10 @@ public class MapActivity extends Fragment implements  MapView.MapViewEventListen
     public void onDestroyView(){
         super.onDestroyView();
         bus.unregister(this);
+        if(isThread){
+            FancyToast.makeText(getActivity(), "페이지 이동 시 귀가 서비스가 종료됩니다.", FancyToast.LENGTH_SHORT, FancyToast.ERROR, true).show();
+            //thread.getth
+        }
         if (isTrackingMode) {
             mMapView.setCurrentLocationTrackingMode(MapView.CurrentLocationTrackingMode.TrackingModeOff);
             mMapView.setShowCurrentLocationMarker(false);

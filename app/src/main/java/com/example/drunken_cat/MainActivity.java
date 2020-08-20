@@ -15,6 +15,8 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -59,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
 
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.frameLayout, fragmentMap).commitAllowingStateLoss();
+        /*
+        transaction.add(R.id.frameLayout, fragmentFriend).commitAllowingStateLoss();
+        transaction.add(R.id.frameLayout, fragmentDriver).commitAllowingStateLoss();
+        transaction.add(R.id.frameLayout, fragmentRecord).commitAllowingStateLoss();*/
     }
 
     public void onBackPressed(){
@@ -75,13 +81,22 @@ public class MainActivity extends AppCompatActivity {
                     transaction.replace(R.id.frameLayout, fragmentMap).commitAllowingStateLoss();
                     break;
                 case R.id.bottom_nav_2:
-                    transaction.replace(R.id.frameLayout, fragmentFriend).commitAllowingStateLoss();
+                    transaction.remove(fragmentFriend).commitNow();
+                    transaction.remove(fragmentRecord).commitNow();
+                    transaction.remove(fragmentDriver).commitNow();
+                    transaction.add(R.id.frameLayout, fragmentFriend, "AddFriend").commitNow();
                     break;
                 case R.id.bottom_nav_3:
-                    transaction.replace(R.id.frameLayout, fragmentDriver).commitAllowingStateLoss();
+                    transaction.remove(fragmentDriver).commitNow();
+                    transaction.remove(fragmentFriend).commitNow();
+                    transaction.remove(fragmentRecord).commitNow();
+                    transaction.add(R.id.frameLayout, fragmentDriver, "ProxyDriver").commitNow();
                     break;
                 case R.id.bottom_nav_4:
-                    transaction.replace(R.id.frameLayout, fragmentRecord).commitAllowingStateLoss();
+                    transaction.remove(fragmentRecord).commitNow();
+                    transaction.remove(fragmentFriend).commitNow();
+                    transaction.remove(fragmentDriver).commitNow();
+                    transaction.add(R.id.frameLayout, fragmentRecord, "Recording").commitNow();
                     break;
             }
             return true;
